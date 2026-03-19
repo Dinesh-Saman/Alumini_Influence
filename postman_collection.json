@@ -1,0 +1,978 @@
+{
+    "info": {
+        "_postman_id": "e8900000-0000-0000-0000-000000000001",
+        "name": "Alumni Influencers API",
+        "description": "Complete collection for testing the Alumni Influencers API.\n\n**Setup:**\n1. Set `baseUrl` collection variable to `http://localhost:3000` (default).\n2. Run **Register**, then check your email for the verification link.\n3. Run **Verify Email** with the token from the link.\n4. Run **Login** — the JWT token is automatically saved to `{{token}}`.\n5. For Client endpoints, first run **Generate API Key** (admin), then set `{{apiKey}}` in collection variables.\n\n**Password rules:** min 8 chars, at least one uppercase, one number, one special character (e.g. `Secure@Pass1`).\n**Email rules:** must be a `.ac.uk` or `.edu` university domain.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "🔐 Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john.smith@eastminster.ac.uk\",\n    \"password\": \"Secure@Pass1\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new alumni account.\n\n- Email must be `.ac.uk` or `.edu` domain\n- Password: min 8 chars, uppercase, number, special character\n- A verification email is sent on success"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register - Admin",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@eastminster.ac.uk\",\n    \"password\": \"Admin@Pass1234\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register an account that will be used as an Admin.\n\nAfter registering, you MUST use the **🔑 Admin — API Keys → 1️⃣ Promote User to Admin (Bootstrap)** request to give this account admin privileges."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register — Invalid Domain (should fail)",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@gmail.com\",\n    \"password\": \"Secure@Pass1\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Should return 400 — email must be a university domain."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register — Weak Password (should fail)",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"jane.doe@eastminster.ac.uk\",\n    \"password\": \"weakpass\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Should return 400 — password too weak (no uppercase, number, or special char)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Email",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/verifyemail/:token",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "verifyemail",
+                                ":token"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "token",
+                                    "value": "",
+                                    "description": "Paste the token from the verification email link here"
+                                }
+                            ]
+                        },
+                        "description": "Paste the token from the verification email URL into the `:token` path variable.\n\nThe token is valid for 24 hours and is single-use."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.token) {",
+                                    "    pm.collectionVariables.set('token', jsonData.token);",
+                                    "    console.log('✅ Token saved to collection variable {{token}}');",
+                                    "} else {",
+                                    "    console.log('❌ No token received:', JSON.stringify(jsonData));",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john.smith@eastminster.ac.uk\",\n    \"password\": \"Secure@Pass1\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login with verified credentials.\n\nOn success, the JWT token is **automatically saved** to the `{{token}}` collection variable and used by all other authenticated requests."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login — Unverified (should fail)",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john.smith@eastminster.ac.uk\",\n    \"password\": \"Secure@Pass1\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login before verifying email. Should return 401."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "description": "Logs out the current user. Requires Bearer JWT. Client should discard the token after this call."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Forgot Password",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john.smith@eastminster.ac.uk\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/forgotpassword",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "forgotpassword"
+                            ]
+                        },
+                        "description": "Sends a password reset email. Token expires in 10 minutes."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"password\": \"NewSecure@Pass99\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/resetpassword/:token",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "resetpassword",
+                                ":token"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "token",
+                                    "value": "",
+                                    "description": "Paste the reset token from the password reset email link"
+                                }
+                            ]
+                        },
+                        "description": "Resets the password using the token from the forgot-password email.\n\nNew password must meet strength rules: min 8 chars, uppercase, number, special character."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "👤 Profile",
+            "item": [
+                {
+                    "name": "Get My Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/profile/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                "me"
+                            ]
+                        },
+                        "description": "Returns the full profile of the currently logged-in alumni."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create / Update Profile",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"bio\": \"Software engineer with 5 years of experience in fintech and edtech.\",\n    \"linkedinUrl\": \"https://uk.linkedin.com/in/johnsmith\",\n    \"degrees\": [\n        {\n            \"degreeTitle\": \"BSc Computer Science\",\n            \"university\": \"University of Eastminster\",\n            \"completionDate\": \"2022-06-15\",\n            \"officialUrl\": \"https://eastminster.ac.uk/courses/computer-science\"\n        }\n    ],\n    \"certifications\": [\n        {\n            \"name\": \"AWS Certified Solutions Architect\",\n            \"issuingOrganization\": \"Amazon Web Services\",\n            \"completionDate\": \"2023-03-01\",\n            \"credentialUrl\": \"https://aws.amazon.com/certification/verify\"\n        }\n    ],\n    \"licences\": [\n        {\n            \"name\": \"Professional Engineer (PEng)\",\n            \"issuingBody\": \"Engineering Council UK\",\n            \"completionDate\": \"2023-09-01\",\n            \"licenceUrl\": \"https://www.engc.org.uk/\"\n        }\n    ],\n    \"professionalCourses\": [\n        {\n            \"courseName\": \"Machine Learning Fundamentals\",\n            \"provider\": \"Coursera\",\n            \"completionDate\": \"2024-01-20\",\n            \"courseUrl\": \"https://coursera.org/certificates/ml-fundamentals\"\n        }\n    ],\n    \"employmentHistory\": [\n        {\n            \"company\": \"Phantasmagoria Ltd\",\n            \"role\": \"Senior Software Engineer\",\n            \"startDate\": \"2022-09-01\",\n            \"endDate\": null,\n            \"current\": true\n        }\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile"
+                            ]
+                        },
+                        "description": "Creates a new profile or updates an existing one. Supports all sections: degrees, certifications, licences, professional courses, and employment history."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Profiles",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile"
+                            ]
+                        },
+                        "description": "Public endpoint — returns all alumni profiles."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Profile By User ID",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/profile/user/:user_id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                "user",
+                                ":user_id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "user_id",
+                                    "value": "",
+                                    "description": "MongoDB ObjectId of the user"
+                                }
+                            ]
+                        },
+                        "description": "Public endpoint — returns a specific alumni profile by their User ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Upload Profile Photo",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": [],
+                                    "description": "Image file (jpeg, jpg, png, gif — max 1MB)"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/profile/uploadphoto",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                "uploadphoto"
+                            ]
+                        },
+                        "description": "Upload a profile photo using `multipart/form-data`. The field key must be `file`.\n\nMax size: 1MB. Accepted types: jpeg, jpg, png, gif."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Profile",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile"
+                            ]
+                        },
+                        "description": "Deletes the current user's profile."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "💰 Bidding",
+            "item": [
+                {
+                    "name": "Place Bid (or Update — increase only)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data) {",
+                                    "    if (jsonData.data.currency) {",
+                                    "        pm.collectionVariables.set('currency', jsonData.data.currency);",
+                                    "    }",
+                                    "    if (jsonData.data.currencySymbol) {",
+                                    "        pm.collectionVariables.set('currencySymbol', jsonData.data.currencySymbol);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 250.00\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/bids",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "bids"
+                            ]
+                        },
+                        "description": "Place a bid for tomorrow's featured slot.\n\n**Blind bidding:** Response only tells you if you are `Winning` or `Losing` — the actual highest bid amount is never revealed.\n\nIf a bid already exists for tomorrow, it can only be **increased**.\n\nResponse includes `remainingWinsThisMonth` so you know how many slots you have left."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Place Bid — Invalid Amount (should fail)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": -10\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/bids",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "bids"
+                            ]
+                        },
+                        "description": "Should return 400 — negative bid amounts are rejected by Joi validation."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Bid Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/bids/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "bids",
+                                "status"
+                            ]
+                        },
+                        "description": "Returns current bid status for tomorrow's slot.\n\nIncludes:\n- `bidStatus`: Winning or Losing\n- `winsThisMonth`: wins so far this month\n- `remainingWinsThisMonth`: how many more you can win\n- `bonusSlotActive`: whether you have the 4th bid slot unlocked"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Bid History",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/bids/history",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "bids",
+                                "history"
+                            ]
+                        },
+                        "description": "Returns all past bids for the current user, most recent first.\n\nStatus values: `active`, `won`, `lost`, `cancelled`."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "🔑 Admin — API Keys",
+            "item": [
+                {
+                    "name": "Promote User to Admin (Bootstrap)",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@eastminster.ac.uk\",\n    \"adminSecret\": \"{{adminSecret}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/promote",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "promote"
+                            ]
+                        },
+                        "description": "**One-time bootstrap step.** Promotes an existing registered user to `admin` role.\n\n**Steps:**\n1. First register the user via `POST /api/auth/register` (or use an existing account)\n2. Run this request — no JWT needed, just the `adminSecret` from `.env`\n3. Then run `Login (Admin)` to get a JWT\n\nThe `{{adminSecret}}` variable is pre-filled in the collection variables as `bootstrap-admin-secret-2025`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login (Admin)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.token) {",
+                                    "    pm.collectionVariables.set('token', jsonData.token);",
+                                    "    console.log('✅ Admin token saved to {{token}}');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@eastminster.ac.uk\",\n    \"password\": \"Admin@Pass1234\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login with the admin account. JWT is automatically saved to `{{token}}`\n\nRun this after `Promote User to Admin`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Generate API Key",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data.key) {",
+                                    "    pm.collectionVariables.set('apiKey', jsonData.data.key);",
+                                    "    console.log('✅ API Key saved to collection variable {{apiKey}}');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"AR Mobile Client v1\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/apikeys",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "apikeys"
+                            ]
+                        },
+                        "description": "**Admin only.** Generates a new API key for a client application.\n\nThe generated key is automatically saved to `{{apiKey}}` collection variable.\n\n⚠️ The key is shown only once — save it securely."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "List All API Keys",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/apikeys",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "apikeys"
+                            ]
+                        },
+                        "description": "**Admin only.** Returns all API keys (without usage stats)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get API Key Usage Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/apikeys/:id/stats",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "apikeys",
+                                ":id",
+                                "stats"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "",
+                                    "description": "MongoDB ObjectId of the API key"
+                                }
+                            ]
+                        },
+                        "description": "**Admin only.** Returns usage statistics for the specified API key: timestamps, endpoints accessed, and HTTP methods."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Revoke API Key",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/apikeys/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "apikeys",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "",
+                                    "description": "MongoDB ObjectId of the API key to revoke"
+                                }
+                            ]
+                        },
+                        "description": "**Admin only.** Deactivates the API key so it can no longer be used. You can reactivate it later using the Activate endpoint."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Activate API Key",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/apikeys/:id/activate",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "apikeys",
+                                ":id",
+                                "activate"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "",
+                                    "description": "MongoDB ObjectId of the API key to reactivate"
+                                }
+                            ]
+                        },
+                        "description": "**Admin only.** Reactivates a previously revoked API key."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Toggle User Bonus Slot",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"available\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/admin/users/:id/bonus",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                ":id",
+                                "bonus"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "",
+                                    "description": "MongoDB ObjectId of the user"
+                                }
+                            ]
+                        },
+                        "description": "**Admin only.** Grants or revokes the 4th bonus bidding slot for a user."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "🌐 Public Client API",
+            "item": [
+                {
+                    "name": "Get Alumni of the Day",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}",
+                                "type": "text",
+                                "description": "API key generated via POST /admin/apikeys"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/client/alumni-of-the-day",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "client",
+                                "alumni-of-the-day"
+                            ]
+                        },
+                        "description": "Returns the complete profile of today's featured alumni.\n\nRequires a valid `x-api-key` header (generated via the Admin endpoint). Every call is logged to the key's usage statistics.\n\nResponse includes: name, bio, profileImage (full URL), linkedinUrl, degrees, certifications, licences, professionalCourses, employmentHistory, appearanceCount."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000",
+            "type": "string",
+            "description": "Base URL of the server. Change this if running on a different port."
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string",
+            "description": "JWT token — automatically set when you run the Login request"
+        },
+        {
+            "key": "apiKey",
+            "value": "",
+            "type": "string",
+            "description": "Client API key — automatically set when you run Generate API Key (Admin)"
+        },
+        {
+            "key": "adminSecret",
+            "value": "bootstrap-admin-secret-2025",
+            "type": "string",
+            "description": "Secret used to promote a user to admin role via POST /api/admin/promote"
+        },
+        {
+            "key": "currency",
+            "value": "GBP",
+            "type": "string",
+            "description": "The current platform currency"
+        },
+        {
+            "key": "currencySymbol",
+            "value": "£",
+            "type": "string",
+            "description": "The visual symbol for the platform currency"
+        }
+    ]
+}
