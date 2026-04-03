@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+
+<main class="auth-container">
+    <div class="glass-panel auth-card">
+        <h2>Create Account</h2>
+        <div id="alertBox" class="alert" style="display: none;"></div>
+        
+        <form id="registerForm" onsubmit="event.preventDefault();">
+            <div class="form-group">
+                <label for="email">University Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="user@university.ac.uk" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 chars, 1 uppercase, 1 symbol" required>
+            </div>
+            
+            <button type="submit" class="btn btn-block mb-3">Register</button>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Already have an account? <a href="/login" style="color: var(--primary-color); text-decoration: none;">Sign In</a></p>
+        </form>
+    </div>
+</main>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const alertBox = document.getElementById('alertBox');
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                alertBox.className = 'alert alert-success';
+                alertBox.textContent = 'Registration successful! Check your email to verify.';
+                alertBox.style.display = 'block';
+                // Reset form
+                document.getElementById('registerForm').reset();
+            } else {
+                alertBox.className = 'alert alert-error';
+                alertBox.textContent = data.message || 'Registration failed';
+                alertBox.style.display = 'block';
+            }
+        } catch (err) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = 'Server connection failed';
+            alertBox.style.display = 'block';
+        }
+    });
+</script>
+
+<%- include('partials/footer') %>

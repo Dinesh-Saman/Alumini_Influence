@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<main class="auth-container">
+    <div class="glass-panel auth-card">
+        <h2>Welcome Back</h2>
+        <div id="alertBox" class="alert" style="display: none;"></div>
+        
+        <form id="loginForm" onsubmit="event.preventDefault();">
+            <div class="form-group">
+                <label for="email">University Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="user@university.ac.uk" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-block mb-3">Sign In</button>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Don't have an account? <a href="/register" style="color: var(--primary-color); text-decoration: none;">Register</a></p>
+        </form>
+    </div>
+</main>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const alertBox = document.getElementById('alertBox');
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin', // Ensure cookies are handled
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                // The backend successfully set the HTTP-only cookie.
+                window.location.href = '/dashboard';
+            } else {
+                alertBox.className = 'alert alert-error';
+                alertBox.textContent = data.message || 'Login failed: Invalid credentials';
+                alertBox.style.display = 'block';
+            }
+        } catch (err) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = 'Server connection failed';
+            alertBox.style.display = 'block';
+        }
+    });
+</script>
+
+<%- include('partials/footer') %>

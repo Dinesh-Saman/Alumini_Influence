@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-layout">
+    <%- include('partials/sidebar') %>
+    
+    <main class="main-content">
+        <header class="mb-4">
+            <h1>Analytics Dashboard</h1>
+            <p style="color: var(--text-muted);">Welcome to the University Intelligence Center</p>
+        </header>
+        
+        <div class="grid-cards">
+            <div class="glass-panel stat-card">
+                <div class="stat-label">Total Alumni Profiles</div>
+                <div class="stat-value" id="totalAlumni">--</div>
+            </div>
+            
+            <div class="glass-panel stat-card">
+                <div class="stat-label">Active Bids Today</div>
+                <div class="stat-value" id="activeBids">--</div>
+            </div>
+            
+            <div class="glass-panel stat-card">
+                <div class="stat-label">API Requests (24h)</div>
+                <div class="stat-value" id="apiRequests">--</div>
+            </div>
+            
+            <div class="glass-panel stat-card">
+                <div class="stat-label">Featured Alumni</div>
+                <div class="stat-value" id="featuredAlumni">None</div>
+            </div>
+        </div>
+        
+        <div class="glass-panel mb-4" style="padding: 1.5rem;">
+            <h2>API Access Tokens</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Tokens used by the Mobile AR App and other clients to access endpoints.</p>
+            
+            <div class="table-container">
+                <table id="apiKeysTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Key</th>
+                            <th>Permissions</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Removed Key Generation Modal for brevity, assume admin provides keys -->
+        </div>
+    </main>
+</div>
+
+<script>
+    // Fetch dashboard summary
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Here we could fetch the exact counts from new API routes or just show some mock data if not built yet.
+        // For now, load API keys since they govern Access:
+        try {
+            // Let's assume the current user is admin. They'll have a JWT cookie.
+            const statsRes = await fetch('/api/admin/apikeys');
+            if (statsRes.ok) {
+                const data = await statsRes.json();
+                const tbody = document.querySelector('#apiKeysTable tbody');
+                tbody.innerHTML = '';
+                
+                if (data.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No API Keys Generated. Configure in Postman or create one.</td></tr>';
+                } else {
+                    data.data.forEach(key => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${key.name}</td>
+                            <td style="font-family: monospace;">${key.key.substring(0, 10)}...</td>
+                            <td>${key.permissions.join(', ')}</td>
+                            <td>
+                                <span style="background: ${key.isActive ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; 
+                                color: ${key.isActive ? '#86efac' : '#fca5a5'}; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
+                                    ${key.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    
+                    document.getElementById('apiRequests').textContent = data.data.reduce((acc, curr) => acc + (curr.usageStats ? curr.usageStats.length : 0), 0);
+                }
+            } else {
+                // Not Admin or error
+                document.querySelector('#apiKeysTable tbody').innerHTML = '<tr><td colspan="4">No permission to view API keys</td></tr>';
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+</script>
+
+<%- include('partials/footer') %>

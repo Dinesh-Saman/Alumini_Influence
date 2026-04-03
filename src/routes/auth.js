@@ -18,8 +18,8 @@ router.post('/register', validate(registerSchema), register);
 // Login
 router.post('/login', validate(loginSchema), login);
 
-// Logout (requires authentication)
-router.get('/logout', protect, logout);
+// Logout (clears cookie)
+router.get('/logout', logout);
 
 // Email verification via secure token in link
 router.get('/verifyemail/:token', verifyEmail);

@@ -270,8 +270,10 @@ exports.resetPassword = async (req, res) => {
 // @route   GET /api/auth/logout
 // @access  Private
 exports.logout = async (req, res) => {
-    // JWT is stateless — the client discards the token.
-    // For cookie-based sessions, we would clear the cookie here.
+    res.cookie('token', 'none', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+    });
     res.status(200).json({ success: true, message: 'Logged out successfully' });
 };
 
@@ -294,7 +296,18 @@ const sendTokenResponse = async (user, statusCode, req, res) => {
     console.log(token);
     console.log('-----------------------------------------');
 
-    res.status(statusCode).json({
+    const options = {
+        expires: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000 // 30 days
+        ),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true;
+    }
+
+    res.status(statusCode).cookie('token', token, options).json({
         success: true,
         token,
     });

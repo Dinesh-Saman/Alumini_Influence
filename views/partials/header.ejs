@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Alumni Influencers Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="navbar-brand">Alumni Analytics</a>
+        <nav class="nav-links">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/graphs">Charts</a>
+                <a href="/alumni-list">Directory</a>
+                <a href="/logout">Logout (<%= user.email %>)</a>
+            <% } else { %>
+                <a href="/login" class="btn">Login</a>
+                <a href="/register" class="btn" style="background: transparent; border: 1px solid var(--primary-color);">Register</a>
+            <% } %>
+        </nav>
+    </header>
