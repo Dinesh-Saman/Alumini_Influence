@@ -1,75 +1,58 @@
-# Alumni Influencers Platform API
+# Alumni Influencers Platform (Coursework 2)
 
-Rest API for the University of Eastminster Alumni Influencers Platform. Allows alumni to bid for "Featured Alumnus of the Day" slots for AR mobile clients.
+## Overview
+A comprehensive MVC web application and RESTful API that transforms real-time alumni career data into actionable intelligence for university curriculum development.
 
-## System Architecture
+## Architecture
+The system utilizes a 3-Tier Architecture with clear component separation:
+1. **Frontend (View):** Server-Side Rendered (SSR) HTML using EJS templates. Styled with Vanilla CSS (Dark mode, glassmorphism). Hosted by the Express server for seamless session management.
+2. **Backend (Controller):** Node.js & Express REST API that handles routing, business logic, session validation, authentication, and data sanitation.
+3. **Database (Model):** MongoDB (Mongoose ORM) normalized in 3NF where applicable.
 
-Follows the Model-View-Controller (MVC) pattern for clean separation of concerns:
+### Database Schema (3NF) Key Entities:
+- **Users:** Authenticated accounts linking to roles (admin vs user).
+- **Profiles:** 1:1 mapped to Users containing normalized arrays for Degrees, Certifications, and Employment.
+- **Bids:** System for the "Alumni of the Day" auction mechanism.
+- **ApiKeys:** Securely hashed tokens mapping to granular permissions like `read:alumni_of_day`.
+- **UsageLogs:** Unified system recording endpoint accesses to track individual client application usage.
 
-- **src/models**: Mongoose schemas
-- **src/controllers**: Logic for requests, bidding, and winner selection
-- **src/routes**: API endpoint definitions
-- **src/middleware**: Auth (JWT), validation (Joi), and sanitization
-- **src/config**: DB and mailer configuration
-- **src/utils**: Helpers (email, etc.)
+## Setup Instructions
 
-## Security
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-- **Authentication**: JWT based sessions
-- **RBAC**: Admin and Alumni roles
-- **Validation**: Strict Joi schemas for all inputs
-- **Sanitization**: Protection against NoSQL Injection and XSS
-- **Protection**: Rate limiting and Helmet security headers
+2. **Environment Configuration:**
+   Copy `.env.example` to `.env` and fill in your MongoDB URI, JWT Secret, and Email configurations.
+   ```bash
+   cp .env.example .env
+   ```
 
-## Database Schema
+3. **Database Seeding (Optional):**
+   Run the seeding scripts to inject an Admin user and test data.
+   ```bash
+   node create_admin.js
+   node seed_winner.js
+   ```
 
-```mermaid
-erDiagram
-    USER ||--|| PROFILE : "has"
-    USER ||--o{ BID : "places"
-    
-    USER {
-        string email
-        string password
-        string role
-        boolean isVerified
-    }
-    
-    PROFILE {
-        ObjectId user
-        string firstName
-        string lastName
-        array degrees
-        int appearanceCount
-    }
-    
-    BID {
-        ObjectId user
-        number amount
-        date targetDate
-        string status
-    }
-```
+4. **Start the Application:**
+   ```bash
+   npm run dev    # Starts with nodemon for development
+   npm run start  # standard production start
+   ```
 
-## Setup
+## API Key Security & Scoping
+This API enforces granular permission scoping using API Keys for machine-to-machine interactions (e.g. mobile AR apps).
 
-### 1. Installation
-1. `npm install`
-2. Create `.env` from `.env.example`
+Example scopes:
+- `read:alumni_of_day`: Can only access the daily winner endpoint.
+- `read:analytics`: Can access dashboard graphing data.
 
-### 2. Run
-```bash
-# dev
-npm run dev
+Pass the key using the custom header `x-api-key`.
 
-# production
-npm start
-```
-
-## API Documentation
-Interactive Swagger UI available at: `http://localhost:3000/api-docs`
-
-## Scripts
-- **postman_collection.json**: Import into Postman for testing
-- **seed_winner.js**: Populate test winner for today
-- **test_selection.js**: Manually trigger bidding selection logic
+## Testing the Dashboards
+1. Navigate to `http://localhost:3000/`
+2. Register an account using an `.ac.uk` or `.edu` email.
+3. Check your console log for the Ethereal email verification link.
+4. Verify your account and Login to access the Analytics Dashboard, Advanced Charts, and Alumni Directory.

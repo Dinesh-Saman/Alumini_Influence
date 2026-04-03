@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { checkApiKey } = require('../middleware/apiKey');
+const { authorizeKey, requireScope } = require('../middleware/apiKeyAuth');
 const Profile = require('../models/Profile');
 const Bid = require('../models/Bid');
 
 // @desc    Get Alumni Influencer of the Day (for AR Client)
 // @route   GET /api/client/alumni-of-the-day
-// @access  Public API (requires valid x-api-key header)
-router.get('/alumni-of-the-day', checkApiKey, async (req, res) => {
+// @access  Public API (requires valid API key with correct scope)
+router.get('/alumni-of-the-day', authorizeKey, requireScope('read:alumni_of_day'), async (req, res) => {
     try {
         // Find the winning bid for TODAY
         // The cron at 6 PM yesterday selected the winner for today's slot.

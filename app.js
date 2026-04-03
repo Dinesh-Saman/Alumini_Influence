@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
@@ -26,6 +27,12 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Added for form data
+app.use(cookieParser());
+
+// Set View Engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Rate Limiting
 const generalLimiter = rateLimit({
@@ -48,7 +55,8 @@ app.use('/api/auth', sensitiveLimiter);
 app.use(mongoSanitize); // Prevent NoSQL Injection
 app.use(xssSanitize);   // Escape HTML tags
 
-// Serve static files (uploads)
+// Serve static files (css, js, uploads)
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Routes
@@ -56,11 +64,13 @@ const authRoutes = require('./src/routes/auth');
 const profileRoutes = require('./src/routes/profile');
 const bidRoutes = require('./src/routes/bid');
 const adminRoutes = require('./src/routes/admin');
+const analyticsRoutes = require('./src/routes/analytics');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/bids', bidRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Public Client API (Protected by API Key)
 // For "Get today's featured alumnus"
@@ -70,9 +80,9 @@ app.use('/api/client', require('./src/routes/client'));
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.get('/', (req, res) => {
-    res.send('Alumni Influencers API is running...');
-});
+// UI Routes
+const uiRoutes = require('./src/routes/ui');
+app.use('/', uiRoutes);
 
 // Custom Error Handling for Malformed JSON
 app.use((err, req, res, next) => {

@@ -30,6 +30,21 @@ const ProfileSchema = new mongoose.Schema({
         type: String, // URL relative to server
         default: 'no-photo.jpg',
     },
+    industrySector: {
+        type: String,
+        required: [true, 'Please specify your industry sector'],
+        enum: [
+            'Technology', 'Healthcare', 'Finance', 'Education', 'Engineering',
+            'Creative Arts', 'Business', 'Public Sector', 'Other'
+        ],
+        default: 'Other'
+    },
+    graduationYear: {
+        type: Number,
+        required: [true, 'Please add your graduation year'],
+        min: 1950,
+        max: new Date().getFullYear() + 5
+    },
     degrees: [
         {
             degreeTitle: { type: String, required: true },

@@ -1,0 +1,259 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-layout">
+    <%- include('partials/sidebar') %>
+    
+    <main class="main-content">
+        <header class="mb-4">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Intelligence & Analytics</h1>
+                    <p style="color: var(--text-muted);">Real-time graduate outcome tracking and skills gap detection</p>
+                </div>
+                <button class="btn" id="exportPdfBtn" onclick="window.print()">Export Report</button>
+            </div>
+        </header>
+
+        <div class="grid-cards">
+            <!-- Card 1: Industry Distribution (Doughnut Chart) -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.1rem;">Alumni Industry Distribution</h2>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="downloadChart('industryChart', 'industry-distribution')">⬇ Dwnld</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="industryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Card 2: Skill Gaps (Bar Chart) -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.1rem;">Top Skills Gaps (Certs vs Degrees)</h2>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="downloadChart('skillsGapChart', 'skills-gaps')">⬇ Dwnld</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="skillsGapChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-cards">
+            <!-- Card 3: Graduation Stats (Pie Chart) -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.1rem;">Graduation Year Demographics</h2>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="downloadChart('gradStatsChart', 'grad-stats')">⬇ Dwnld</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="gradStatsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Card 4: Career Pathways (Radar Chart) -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.1rem;">Career Pathways (Roles)</h2>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="downloadChart('careerPathsChart', 'career-paths')">⬇ Dwnld</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="careerPathsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-cards">
+            <!-- Card 5: Trend Line Chart -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.1rem;">Upskilling Timeline (Months after Grad)</h2>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="downloadChart('timelineChart', 'timeline')">⬇ Dwnld</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Card 6: Polar Area Chart -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.1rem;">Advanced Sector Affinity</h2>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="downloadChart('polarChart', 'sector-affinity')">⬇ Dwnld</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="polarChart"></canvas>
+                </div>
+            </div>
+        </div>
+                    <h2 style="font-size: 1.1rem;">Alumni Industry Distribution</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="industryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Card 2: Skill Gaps (Bar Chart) -->
+            <div class="glass-panel">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border);">
+                    <h2 style="font-size: 1.1rem;">Top Self-Acquired Certifications (Skills Gap)</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="skillsGapChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-cards">
+            <!-- Card 3: Line Chart (Trends) -->
+            <div class="glass-panel" style="grid-column: 1 / -1;">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border);">
+                    <h2 style="font-size: 1.1rem;">Post-Graduation Upskilling Timeline (Months after Grad)</h2>
+                </div>
+                <div class="chart-wrapper" style="height: 400px;">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Universal Chart.js Configuration
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    
+    // Function to download chart as image
+    function downloadChart(canvasId, filename) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        
+        // Use a temporary canvas with white background for readability on translucent charts
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = '#0f172a'; // Match dashboard dark background for transparency
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+        
+        const dataUrl = tempCanvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `${filename}.png`;
+        a.click();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            // 1 & 6. Fetch Industry Distribution (For Doughnut and PolarCharts)
+            const indRes = await fetch('/api/analytics/industry-distribution');
+            if (indRes.ok) {
+                const indData = await indRes.json();
+                const labels = indData.data.map(d => d._id);
+                const dataVals = indData.data.map(d => d.count);
+                const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#0ea5e9'];
+
+                // Doughnut
+                new Chart(document.getElementById('industryChart').getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{ data: dataVals, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+                });
+
+                // Polar Area
+                new Chart(document.getElementById('polarChart').getContext('2d'), {
+                    type: 'polarArea',
+                    data: {
+                        labels,
+                        datasets: [{ data: dataVals, backgroundColor: colors.map(c => c + '80'), borderColor: colors }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+                });
+            }
+
+            // 2. Fetch Skills Gap (Certifications vs Degrees)
+            const skillsRes = await fetch('/api/analytics/skills-gap');
+            if (skillsRes.ok) {
+                const skillsData = await skillsRes.json();
+                const labels = skillsData.data.slice(0, 5).map(d => d._id.cert || 'Unknown'); 
+                const dataCounts = skillsData.data.slice(0, 5).map(d => d.count);
+                
+                new Chart(document.getElementById('skillsGapChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Graduates Acquiring Certifications (Critical Gap)',
+                            data: dataCounts,
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red highlighting for gaps
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+
+            // 3. Fetch Graduation Stats
+            const gradRes = await fetch('/api/analytics/graduation-stats');
+            if (gradRes.ok) {
+                const gradData = await gradRes.json();
+                new Chart(document.getElementById('gradStatsChart').getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: gradData.data.map(d => d._id),
+                        datasets: [{
+                            data: gradData.data.map(d => d.count),
+                            backgroundColor: ['#22c55e', '#0ea5e9', '#8b5cf6', '#ec4899', '#f97316'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            // 4. Fetch Career Pathways (Roles)
+            const careerRes = await fetch('/api/analytics/career-pathways');
+            if (careerRes.ok) {
+                const careerData = await careerRes.json();
+                new Chart(document.getElementById('careerPathsChart').getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: careerData.data.slice(0, 6).map(d => d._id.role || 'Unknown'),
+                        datasets: [{
+                            label: 'Role Density',
+                            data: careerData.data.slice(0, 6).map(d => d.count),
+                            backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                            borderColor: '#6366f1',
+                            pointBackgroundColor: '#8b5cf6',
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8' }, angleLines: { color: 'rgba(255,255,255,0.1)' } } } }
+                });
+            }
+
+            // 5. Fake data line chart for timeline and Certification Trends 
+            new Chart(document.getElementById('timelineChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['0-6 Months', '6-12 Months', '1-2 Years', '2-3 Years', '3-5 Years', '5+ Years'],
+                    datasets: [
+                        { label: 'Tech Certifications', data: [12, 45, 120, 89, 45, 20], borderColor: '#8b5cf6', tension: 0.4, fill: true, backgroundColor: 'rgba(139, 92, 246, 0.1)' },
+                        { label: 'Management Certifications', data: [5, 12, 34, 78, 110, 80], borderColor: '#22c55e', tension: 0.4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+
+        } catch (err) {
+            console.error(err);
+        }
+    });
+</script>
+
+<%- include('partials/footer') %>

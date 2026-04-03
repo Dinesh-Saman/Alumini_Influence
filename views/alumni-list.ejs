@@ -1,0 +1,155 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-layout">
+    <%- include('partials/sidebar') %>
+    
+    <main class="main-content">
+        <header class="mb-4">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Alumni Directory</h1>
+                    <p style="color: var(--text-muted);">View and filter alumni by programme, sector, and graduation date (CW2 Req)</p>
+                </div>
+                <button class="btn" onclick="exportTableToCSV('alumni_directory.csv')">Export CSV</button>
+            </div>
+        </header>
+
+        <div class="glass-panel mb-4" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Filters</h2>
+                <button class="btn" style="background: transparent; border: 1px solid var(--glass-border); padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="saveFilters()">Save Presets</button>
+            </div>
+            <div class="filter-bar mt-4">
+                <select id="sectorFilter" class="form-control" style="width: 200px;">
+                    <option value="">All Sectors</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Business">Business</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Finance">Finance</option>
+                </select>
+                
+                <input type="number" id="yearFilter" class="form-control" style="width: 150px;" placeholder="Grad Year (e.g. 2023)">
+                
+                <button id="applyFiltersBtn" class="btn">Apply Filters</button>
+            </div>
+        </div>
+
+        <div class="table-container glass-panel">
+            <table id="alumniTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Industry Sector</th>
+                        <th>Graduation Year</th>
+                        <th>Degrees</th>
+                        <th>Certifications</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6">Loading Alumni Data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script>
+    async function loadAlumni() {
+        const sector = document.getElementById('sectorFilter').value;
+        const year = document.getElementById('yearFilter').value;
+
+        try {
+            // Need a UI API endpoint or use the existing ones
+            // Actually, we can fetch from a generic /api/profile endpoint 
+            // We'll create a basic fetch here if it exists.
+            
+            const res = await fetch(`/api/profile`); // Assuming this exists or we mock it
+            if (res.ok) {
+                const data = await res.json();
+                let profiles = data.data || [];
+
+                if (sector) {
+                    profiles = profiles.filter(p => p.industrySector === sector);
+                }
+                if (year) {
+                    profiles = profiles.filter(p => p.graduationYear === parseInt(year));
+                }
+
+                const tbody = document.querySelector('#alumniTable tbody');
+                tbody.innerHTML = '';
+
+                if (profiles.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6">No alumni found matching criteria.</td></tr>';
+                    return;
+                }
+
+                profiles.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${p.firstName} ${p.lastName}</strong></td>
+                        <td><span style="background: rgba(99,102,241,0.2); color: #818cf8; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${p.industrySector}</span></td>
+                        <td>${p.graduationYear}</td>
+                        <td>${p.degrees ? p.degrees.length : 0} degrees</td>
+                        <td>${p.certifications ? p.certifications.length : 0} certs</td>
+                        <td><button class="btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Profile</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                document.querySelector('#alumniTable tbody').innerHTML = '<tr><td colspan="6">Error loading profiles</td></tr>';
+            }
+        } catch (err) {
+            console.error(err);
+            document.querySelector('#alumniTable tbody').innerHTML = '<tr><td colspan="6">No Public API accessible to list all profiles initially. Please ensure the admin endpoint is setup to return profiles.</td></tr>';
+        }
+    }
+
+    function exportTableToCSV(filename) {
+        const rows = document.querySelectorAll('table#alumniTable tr');
+        let csv = [];
+        for (let i = 0; i < rows.length; i++) {
+            let row = [], cols = rows[i].querySelectorAll('td, th');
+            for (let j = 0; j < cols.length - 1; j++) { // Skip the last 'Action' column
+                row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+            }
+            csv.push(row.join(','));
+        }
+        downloadCSV(csv.join('\n'), filename);
+    }
+
+    function downloadCSV(csv, filename) {
+        const csvFile = new Blob([csv], { type: 'text/csv' });
+        const downloadLink = document.createElement('a');
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+
+    function saveFilters() {
+        const sector = document.getElementById('sectorFilter').value;
+        const year = document.getElementById('yearFilter').value;
+        localStorage.setItem('alumniFilters', JSON.stringify({ sector, year }));
+        alert('Filters saved as default presets!');
+    }
+
+    function loadFilters() {
+        const saved = localStorage.getItem('alumniFilters');
+        if (saved) {
+            const { sector, year } = JSON.parse(saved);
+            if (sector) document.getElementById('sectorFilter').value = sector;
+            if (year) document.getElementById('yearFilter').value = year;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadFilters();
+        loadAlumni();
+    });
+    document.getElementById('applyFiltersBtn').addEventListener('click', loadAlumni);
+</script>
+
+<%- include('partials/footer') %>

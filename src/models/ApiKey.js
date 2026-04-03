@@ -16,15 +16,25 @@ const ApiKeySchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    permissions: [{
+        type: String,
+        enum: ['read:alumni', 'read:analytics', 'read:alumni_of_day', 'write:alumni', 'admin:all'],
+        default: ['read:alumni']
+    }],
+    lastUsed: {
+        type: Date
+    },
     createdAt: {
         type: Date,
         default: Date.now,
     },
     usageStats: [
         {
-            date: { type: Date, default: Date.now },
+            timestamp: { type: Date, default: Date.now },
             endpoint: String,
-            method: String
+            method: String,
+            ip: String,
+            statusCode: Number
         }
     ]
 });
