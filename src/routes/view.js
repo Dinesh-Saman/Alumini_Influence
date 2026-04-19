@@ -39,6 +39,16 @@ router.get('/register', redirectIfAuthenticated, (req, res) => {
     res.render('register', { title: 'Register', error: null, success: null });
 });
 
+// Route: Forgot Password Page
+router.get('/forgot-password', redirectIfAuthenticated, (req, res) => {
+    res.render('forgot-password', { title: 'Forgot Password', error: null, success: null });
+});
+
+// Route: Reset Password Page
+router.get('/reset-password/:token', redirectIfAuthenticated, (req, res) => {
+    res.render('reset-password', { title: 'Reset Password', token: req.params.token, error: null });
+});
+
 // Route: Dashboard
 router.get('/dashboard', ensureAuthenticated, async (req, res) => {
     try {

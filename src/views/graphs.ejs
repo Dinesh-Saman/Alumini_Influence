@@ -13,7 +13,8 @@
             </button>
         </div>
         <p class="chart-desc">Identifies independent certifications acquired post-graduation. High percentages signal missing technical topics in the university curriculum.</p>
-        <div class="chart-container" style="height: 220px;">
+        <div class="chart-container" style="height: 220px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="skillsGapChart"></canvas>
         </div>
     </div>
@@ -27,7 +28,8 @@
             </button>
         </div>
         <p class="chart-desc">Distribution of alumni across professional roles. Hover to see the academic background of people in these positions.</p>
-        <div class="chart-container" style="height: 220px;">
+        <div class="chart-container" style="height: 220px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="rolesChart"></canvas>
         </div>
     </div>
@@ -41,7 +43,8 @@
             </button>
         </div>
         <p class="chart-desc">Total alumni count grouped by academic degree programme. Shows current roles of graduates from each programme.</p>
-        <div class="chart-container" style="height: 280px;">
+        <div class="chart-container" style="height: 280px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="careerPathwaysChart"></canvas>
         </div>
     </div>
@@ -55,7 +58,8 @@
             </button>
         </div>
         <p class="chart-desc">Tracking alumni placement and hiring trends across top global companies and industries by graduation year.</p>
-        <div class="chart-container" style="height: 300px;">
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="industryDemandChart"></canvas>
         </div>
     </div>
@@ -69,7 +73,8 @@
             </button>
         </div>
         <p class="chart-desc">Distribution of alumni across official issuing bodies and professional boards (e.g., Engineering Council, ACCA).</p>
-        <div class="chart-container" style="height: 380px;">
+        <div class="chart-container" style="height: 380px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="licencesChart"></canvas>
         </div>
     </div>
@@ -83,7 +88,8 @@
             </button>
         </div>
         <p class="chart-desc">Distribution of independent professional courses completed. High engagement usually correlates with specific career trajectories.</p>
-        <div class="chart-container" style="height: 380px;">
+        <div class="chart-container" style="height: 380px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="coursesChart"></canvas>
         </div>
     </div>
@@ -97,7 +103,8 @@
             </button>
         </div>
         <p class="chart-desc">Ranking of the top institutional partners and corporate entities hiring our alumni network.</p>
-        <div class="chart-container" style="height: 380px;">
+        <div class="chart-container" style="height: 380px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="placementLineChart"></canvas>
         </div>
     </div>
@@ -111,7 +118,8 @@
             </button>
         </div>
         <p class="chart-desc">Multi-dimensional comparison of top industries across professional pillars: Certifications, Courses, Licenses, and Experience.</p>
-        <div class="chart-container" style="height: 420px;">
+        <div class="chart-container" style="height: 420px; position: relative;">
+            <div class="chart-loader"><div class="spinner"></div></div>
             <canvas id="competencyRadarChart"></canvas>
         </div>
     </div>
@@ -174,12 +182,42 @@
     transform: translateY(-2px);
 }
 
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
+.chart-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.4); /* match dashboard bg with transparency */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.5s ease;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.2); }
+    50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+}
+
+.chart-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 </style>

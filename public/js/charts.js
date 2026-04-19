@@ -525,9 +525,20 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
             });
         }
+        
+        // Hide all loaders after charts are initialized
+        document.querySelectorAll('.chart-loader').forEach(loader => {
+            loader.classList.add('hidden');
+            setTimeout(() => loader.style.display = 'none', 500);
+        });
+
     } catch (err) {
         if (err.name === 'AbortError') return;
         console.error('Error loading real-time charts:', err);
+        // Also hide loaders on error to show empty state/error
+        document.querySelectorAll('.chart-loader').forEach(loader => {
+            loader.style.display = 'none';
+        });
     }
 
     // 9. Delegated Event Listener for Chart Downloads (CSP Compliant)

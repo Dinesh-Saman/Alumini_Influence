@@ -196,14 +196,14 @@ exports.forgotPassword = async (req, res) => {
 
         await user.save({ validateBeforeSave: false });
 
-        // Create reset URL
-        const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/resetpassword/${resetToken}`;
+        // Create reset URL (pointing to the frontend browser view)
+        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
         console.log(`--- Password Reset for ${user.email} ---`);
         console.log(`URL: ${resetUrl}`);
         console.log('-----------------------------------------');
 
-        const message = `You are receiving this email because a password reset was requested for your account.\n\nTo reset your password, make a PUT request to:\n\n ${resetUrl}\n\nThis link will expire in 10 minutes.\n\nIf you did not request this, please ignore this email and your password will remain unchanged.`;
+        const message = `You are receiving this email because a password reset was requested for your account.\n\nTo reset your password, please click the secure link below:\n\n ${resetUrl}\n\nThis link will expire in 10 minutes.\n\nIf you did not request this, please ignore this email and your password will remain unchanged.`;
 
         try {
             await sendEmail({
