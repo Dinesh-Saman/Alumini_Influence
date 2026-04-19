@@ -1,0 +1,148 @@
+<div class="auth-wrapper">
+    <div class="auth-card glass-card animate-fade-in">
+        <div class="auth-header" style="<%= error ? 'margin-bottom: 0.75rem;' : '' %>">
+            <div class="auth-logo">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <h1>System Login</h1>
+            <p>University Analytics Platform</p>
+        </div>
+        
+        <% if (error) { %>
+            <div class="alert alert-error" style="margin-bottom: 0.75rem; padding: 0.6rem 1rem;">
+                <i class="fa-solid fa-circle-exclamation"></i> <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/login" method="POST" class="auth-form">
+            <div class="form-group mb-4">
+                <label><i class="fa-solid fa-envelope"></i> Administrator Email</label>
+                <input type="email" name="email" required placeholder="name@university.ac.uk" class="glass-input">
+            </div>
+            <div class="form-group mb-4">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" name="password" required placeholder="••••••••" class="glass-input">
+            </div>
+            
+            <button type="submit" class="btn-primary auth-btn">
+                <span>Secure Access</span>
+                <i class="fa-solid fa-shield-halved"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Institutional Access Only</p>
+            <div class="auth-links">
+                Don't have an account? <a href="/register">Register Platform</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent),
+                radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.1), transparent);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 1.5rem 2rem !important;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-header { margin-bottom: 1.25rem; }
+
+.auth-logo {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+.auth-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.15rem;
+    letter-spacing: -0.5px;
+}
+
+.auth-header p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.glass-input {
+    background: rgba(15, 23, 42, 0.4) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    width: 100%;
+    transition: all 0.3s ease !important;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 0.8rem !important;
+    font-size: 0.95rem !important;
+    margin-top: 0.25rem;
+    justify-content: center;
+}
+
+.auth-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.auth-footer p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.auth-links {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.auth-links a {
+    color: var(--primary-light);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.alert-error {
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    color: #f43f5e;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+</style>

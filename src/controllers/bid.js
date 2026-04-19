@@ -179,20 +179,19 @@ exports.getBidHistory = async (req, res) => {
 };
 
 // ---------------------------------------------------------------------------
-// CRON JOB: Run every day at 6 PM (18:00) to select the Alumni of the Day
+// CRON JOB: Run every day at Midnight (00:00) to select the Alumni of the Day
 // ---------------------------------------------------------------------------
 // How it works:
 //  - Alumni place bids today for TOMORROW's featured slot (targetDate = tomorrow)
-//  - At 6 PM, this cron triggers for tomorrow's featured slot (targetDate = tomorrow)
+//  - At Midnight, this cron triggers for the emerging day (targetDate = today)
 //  - Highest bidder wins, their profile is featured, and they receive an email.
 //  - All others are marked as 'lost' and also receive a courtesy notification.
 // ---------------------------------------------------------------------------
-cron.schedule('0 18 * * *', async () => {
-    console.log('[CRON] Starting Daily Winner Selection (6 PM)...');
+cron.schedule('0 0 * * *', async () => {
+    console.log('[CRON] Starting Daily Winner Selection (Midnight)...');
 
-    // At 6 PM, we look for bids where targetDate is TOMORROW
+    // At Midnight, we look for bids where targetDate is TODAY since the date has rolled over
     const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 1);
     targetDate.setHours(0, 0, 0, 0);
 
     try {

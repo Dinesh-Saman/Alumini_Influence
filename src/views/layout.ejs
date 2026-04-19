@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | University Analytics & Intelligence Dashboard</title>
+    <!-- Modern Font: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for professional icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <% if (title !== 'Login' && title !== 'Register') { %>
+        <header class="top-navbar">
+            <div class="nav-brand">
+                <i class="fa-solid fa-graduation-cap"></i> 
+                University<span> Analytics & Intelligence Dashboard</span>
+            </div>
+            <div class="nav-actions">
+                <div class="nav-user">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Admin Avatar">
+                    <span>Admin User</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-wrapper">
+            <aside class="sidebar">
+                <ul class="nav-links">
+                    <li>
+                        <a href="/dashboard" class="<%= title === 'Dashboard' ? 'active' : '' %>">
+                            <i class="fa-solid fa-house-chimney"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/alumni" class="<%= title === 'View Alumni' ? 'active' : '' %>">
+                            <i class="fa-solid fa-users-gear"></i> <span>Directory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/graphs" class="<%= title === 'Analytics Graphs' ? 'active' : '' %>">
+                            <i class="fa-solid fa-chart-line"></i> <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/apikeys" class="<%= title === 'API Key Management' ? 'active' : '' %>">
+                            <i class="fa-solid fa-key"></i> <span>API Management</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <a href="/logout" class="btn-logout">
+                    <i class="fa-solid fa-power-off"></i> <span>Logout</span>
+                </a>
+            </aside>
+
+            <main class="main-content">
+                <%- body %>
+            </main>
+        </div>
+
+        <footer style="padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--glass-border); background: var(--bg-nav); backdrop-filter: var(--glass-blur);">
+            &copy; 2026 University Analytics & Intelligence Dashboard. Built for Excellence.
+        </footer>
+    <% } else { %>
+        <%- body %>
+    <% } %>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<div class="dashboard-header animate-fade-in">
+    <h1><i class="fa-solid fa-key"></i> API Key Management</h1>
+    <p>Configure granular access permissions and scoped tokens for external client applications.</p>
+</div>
+
+<!-- Key Creation Form -->
+<div class="glass-card mb-4 animate-fade-in" style="animation-delay: 0.1s;">
+    <h3><i class="fa-solid fa-plus-circle"></i> Generate New Platform Key</h3>
+    <form id="keyForm" class="mt-3">
+        <div class="form-group mb-3">
+            <label for="name" style="color: var(--text-muted); font-size: 0.9rem; display: block; margin-top: 0.5rem; margin-bottom: 0.5rem;">Client Platform Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="e.g. University Analytics Dashboard" required style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; padding: 0.8rem; border-radius: 8px; width: 100%;">
+        </div>
+        
+        <div class="form-group mb-4">
+            <label style="color: var(--text-muted); font-size: 0.9rem; display: block; margin-top: 1rem; margin-bottom: 0.8rem;">Granular Permissions (Scoping)</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
+                    <input type="checkbox" name="permissions" value="read:alumni"> 
+                    <span>read:alumni</span>
+                </label>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
+                    <input type="checkbox" name="permissions" value="read:analytics"> 
+                    <span>read:analytics</span>
+                </label>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
+                    <input type="checkbox" name="permissions" value="read:donations"> 
+                    <span>read:donations</span>
+                </label>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
+                    <input type="checkbox" name="permissions" value="read:alumni_of_day"> 
+                    <span>read:alumni_of_day</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: auto; padding: 0.8rem 2rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Scoped Key</button>
+    </form>
+</div>
+
+<!-- Active Keys Table -->
+<div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
+    <h3 style="margin-bottom: 1.5rem; margin-left: 1.2rem;"><i class="fa-solid fa-list-check"></i> Active Platform Keys</h3>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Bearer Token (API Key)</th>
+                    <th>Permissions</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="apiKeysList">
+                <tr><td colspan="5" class="loading-state">Loading keys...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadKeys();
+
+    document.getElementById('keyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const permissions = Array.from(document.querySelectorAll('input[name="permissions"]:checked')).map(el => el.value);
+
+        if (permissions.length === 0) {
+            alert('Please select at least one permission scope.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/admin/apikeys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, permissions })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Key Generated Successfully!');
+                document.getElementById('keyForm').reset();
+                loadKeys();
+            } else {
+                alert(data.message || 'Error generating key');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+});
+
+async function loadKeys() {
+    try {
+        const res = await fetch('/api/admin/apikeys');
+        const data = await res.json();
+        
+        const tbody = document.getElementById('apiKeysList');
+        if (data.success && data.data) {
+            if (data.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="loading-state">No API keys found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.data.map(key => `
+                <tr>
+                    <td><strong>${key.name}</strong></td>
+                    <td style="font-family: monospace; color: #10b981; font-size: 0.85rem; position: relative;">
+                        <span id="key-text-${key._id}" data-full-key="${key.key}">${key.key.substr(0, 6)}••••••••${key.key.substr(-6)}</span>
+                        <div style="display: flex; gap: 8px; margin-top: 5px;">
+                            <button class="btn-icon btn-action" data-action="copy" data-id="${key._id}" title="Copy Key">
+                                <i class="fa-regular fa-copy" id="copy-icon-${key._id}"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        ${key.permissions.map(p => `<span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #818cf8; margin-right: 5px; font-size: 0.7rem;">${p}</span>`).join('')}
+                    </td>
+                    <td>
+                        <span class="badge" style="background: ${key.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)'}; color: ${key.isActive ? '#10b981' : '#f43f5e'};">
+                            ${key.isActive ? 'Active' : 'Revoked'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-logout btn-action" data-action="revoke" data-id="${key._id}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2);">Revoke</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// CSP-Compliant Event Delegation
+document.getElementById('apiKeysList').addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-action');
+    if (!btn) return;
+    
+    const action = btn.getAttribute('data-action');
+    const id = btn.getAttribute('data-id');
+    
+    if (action === 'copy') copyKey(id);
+    if (action === 'revoke') revokeKey(id);
+});
+
+async function copyKey(id) {
+    const el = document.getElementById(`key-text-${id}`);
+    const fullKey = el.getAttribute('data-full-key');
+    const icon = document.getElementById(`copy-icon-${id}`);
+    
+    try {
+        await navigator.clipboard.writeText(fullKey);
+        
+        // Visual Success Feedback
+        icon.classList.remove('fa-copy');
+        icon.classList.add('fa-check');
+        icon.style.color = '#10b981';
+        
+        setTimeout(() => {
+            icon.classList.remove('fa-check');
+            icon.classList.add('fa-copy');
+            icon.style.color = '';
+        }, 2000);
+    } catch (err) {
+        // Fallback for non-secure contexts
+        const textArea = document.createElement("textarea");
+        textArea.value = fullKey;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert('API Key copied (Legacy mode)');
+        } catch (copyErr) {
+            console.error('Failed to copy', copyErr);
+        }
+        document.body.removeChild(textArea);
+    }
+}
+
+async function revokeKey(id) {
+    if (!confirm('Are you sure you want to revoke this key? Client access will be immediately terminated.')) return;
+    try {
+        const res = await fetch(`/api/admin/apikeys/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            loadKeys();
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+</script>
+
+<style>
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+.btn-icon {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-icon:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+.badge { text-transform: none; font-weight: 600; }
+</style>

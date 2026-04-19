@@ -1,0 +1,496 @@
+<div class="print-only-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #6366f1; padding-bottom: 1.5rem; margin-bottom: 2rem;">
+        <div>
+            <h1 style="margin: 0; color: #0f172a; font-size: 2.2rem; letter-spacing: -0.5px;">University Analytics & Intelligence</h1>
+            <p style="margin: 5px 0 0 0; color: #64748b; font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Official Alumni Impact Report</p>
+        </div>
+        <div style="text-align: right; background: #f0fdf4; padding: 1rem; border-radius: 12px; border: 1px solid #dcfce7;">
+            <p style="margin: 0; font-size: 0.85rem; color: #10b981; font-weight: 700; text-transform: uppercase;">Report Generated</p>
+            <p style="margin: 5px 0 0 0; font-weight: 800; color: #0f172a; font-size: 1.1rem;"><span id="printDate"></span></p>
+        </div>
+    </div>
+    <div id="printFilters" style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; font-size: 0.85rem; border: 1px solid #e2e8f0;">
+        <strong>Active Filters:</strong> <span id="activeFiltersText">None</span>
+    </div>
+</div>
+
+<div class="dashboard-header animate-fade-in">
+    <h1><i class="fa-solid fa-users"></i> Alumni Directory</h1>
+    <p>Look up and filter our network of professional alumni.</p>
+</div>
+
+<div class="glass-card mb-4 animate-fade-in shadow-sm">
+    <div class="chart-header">
+        <h3><i class="fa-solid fa-filter"></i> Search Filters</h3>
+        <button id="resetFilters" class="btn-pagination" style="border: none; background: transparent;"><i class="fa-solid fa-arrows-rotate"></i> Reset</button>
+    </div>
+    
+    <form id="filterForm" class="filter-form">
+        <div class="form-group">
+            <label><i class="fa-solid fa-book-open"></i> Programme</label>
+            <select name="programme" id="programmeFilter">
+                <option value="">All Programmes</option>
+                <option value="Computer Science">BSc in Computer Science</option>
+                <option value="Business Administration">BSc in Business Administration</option>
+                <option value="Engineering">BSc in Engineering</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-calendar-days"></i> Graduation Year</label>
+            <select id="yearFilter">
+                <option value="">All Years</option>
+                <% for(let year = new Date().getFullYear(); year >= 2015; year--) { %>
+                    <option value="<%= year %>"><%= year %></option>
+                <% } %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-briefcase"></i> Industry</label>
+            <select id="industryFilter">
+                <option value="">All Industries</option>
+                <option value="Technology">Technology</option>
+                <option value="Finance">Finance</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Education">Education</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Arts & Design">Arts & Design</option>
+                <option value="Business & Management">Business & Management</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Consulting">Consulting</option>
+                <option value="Legal">Legal</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Science">Science</option>
+            </select>
+        </div>
+    </form>
+
+    <div class="export-presets-bar mt-4">
+        <div class="export-actions">
+            <button id="exportCsvBtn" class="btn-pagination"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            <button id="exportPdfBtn" class="btn-pagination"><i class="fa-solid fa-file-pdf"></i> Save as PDF</button>
+        </div>
+        <div class="preset-actions">
+            <select id="presetLoader" class="btn-pagination" style="background: var(--bg-nav); border: 1px solid var(--glass-border);">
+                <option value="">-- Load Preset --</option>
+            </select>
+            <button id="savePresetBtn" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Current Filter
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="table-container animate-fade-in shadow-lg">
+    <table class="data-table" id="alumniTable">
+        <thead>
+            <tr>
+                <th style="width: 18%;"><i class="fa-solid fa-user"></i> Full Name</th>
+                <th style="width: 30%;"><i class="fa-solid fa-graduation-cap"></i> Programme</th>
+                <th style="width: 8%;"><i class="fa-solid fa-calendar"></i> Year</th>
+                <th style="width: 22%;"><i class="fa-solid fa-building"></i> Current Company</th>
+                <th style="width: 22%;"><i class="fa-solid fa-briefcase"></i> Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="5" class="loading-state"><div class="loader"></div> Loading Alumni...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination Controls -->
+<div class="pagination-container animate-fade-in">
+    <div class="pagination-info">
+        Showing <strong id="startIndex">0</strong> - <strong id="endIndex">0</strong> of <strong id="totalItems">0</strong> alumni
+    </div>
+    <div class="pagination-controls">
+        <button id="prevBtn" class="btn-pagination" onclick="changePage(-1)" disabled>
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div id="pageNumbers" class="page-numbers"></div>
+        <button id="nextBtn" class="btn-pagination" onclick="changePage(1)" disabled>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<style>
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+}
+.pagination-info {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-pagination {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+.btn-pagination:hover:not(:disabled) {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+.btn-pagination:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.page-numbers {
+    display: flex;
+    gap: 0.25rem;
+}
+.page-num {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+.page-num:hover:not(.active) {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.page-num.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+/* Print Optimization */
+.print-only-header { display: none; }
+@media print {
+    title { display: none; }
+    .sidebar, .top-navbar, .export-presets-bar, .chart-header, .btn-pagination, .pagination, #filterForm, .dashboard-header {
+        display: none !important;
+    }
+    .print-only-header { display: block !important; }
+    .app-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
+    .main-content { margin: 0 !important; padding: 0 !important; }
+    .glass-card { border: none !important; box-shadow: none !important; padding: 0 !important; background: transparent !important; }
+    .table-container { box-shadow: none !important; border: 1px solid #e2e8f0 !important; margin-top: 1rem !important; background: transparent !important; border-radius: 0; }
+    .data-table { border-collapse: collapse !important; width: 100% !important; }
+    .data-table th { background: #f1f5f9 !important; color: #1e293b !important; border: 1px solid #e2e8f0 !important; font-weight: 700 !important; }
+    .data-table td { border: 1px solid #e2e8f0 !important; font-size: 9pt !important; color: #334155 !important; }
+    .prog-badge { background: transparent !important; border: none !important; color: inherit !important; padding: 0 !important; font-weight: normal !important; box-shadow: none !important; }
+}
+</style>
+
+<script>
+let currentPage = 1;
+const pageSize = 10;
+let filteredAlumni = [];
+let alumniFetchController = null;
+
+// Helper to get active filters string
+function getFilterSummary() {
+    const prog = document.getElementById('programmeFilter').value || 'All Programmes';
+    const year = document.getElementById('yearFilter').value || 'All Years';
+    const ind = document.getElementById('industryFilter').value || 'All Industries';
+    return `${prog} | ${year} | ${ind}`;
+}
+
+function renderTable() {
+    const tbody = document.querySelector('#alumniTable tbody');
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const pagedData = filteredAlumni.slice(start, end);
+    
+    let html = '';
+    if (pagedData.length === 0) {
+        html = '<tr><td colspan="5" class="loading-state"><i class="fa-solid fa-folder-open"></i><br>No matching alumni found.</td></tr>';
+    } else {
+        pagedData.forEach(a => {
+            html += `<tr>
+                <td><strong>${a.firstName} ${a.lastName}</strong></td>
+                <td><span class="badge prog-badge" style="white-space: nowrap;">${a._derivedProg}</span></td>
+                <td>${a._derivedYear}</td>
+                <td><i class="fa-solid fa-building"></i> ${a._derivedInd}</td>
+                <td>${a._derivedRole}</td>
+            </tr>`;
+        });
+    }
+    tbody.innerHTML = html;
+    updatePaginationUI();
+}
+
+function updatePaginationUI() {
+    const total = filteredAlumni.length;
+    const totalPages = Math.ceil(total / pageSize);
+    const start = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, total);
+    
+    document.getElementById('startIndex').textContent = start;
+    document.getElementById('endIndex').textContent = end;
+    document.getElementById('totalItems').textContent = total;
+    
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+    
+    // Page Numbers
+    const pageNumbers = document.getElementById('pageNumbers');
+    pageNumbers.innerHTML = '';
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('div');
+        btn.className = `page-num ${i === currentPage ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.onclick = () => {
+            currentPage = i;
+            renderTable();
+        };
+        pageNumbers.appendChild(btn);
+    }
+}
+
+function changePage(delta) {
+    const totalPages = Math.ceil(filteredAlumni.length / pageSize);
+    const newPage = currentPage + delta;
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderTable();
+    }
+}
+
+async function loadAlumni() {
+    // 1. Cancel any active fetch to prevent race conditions
+    if (alumniFetchController) {
+        alumniFetchController.abort();
+    }
+    alumniFetchController = new AbortController();
+    const { signal } = alumniFetchController;
+
+    const tbody = document.querySelector('#alumniTable tbody');
+    tbody.innerHTML = '<tr><td colspan="5" class="loading-state"><div class="loader"></div> Processing request...</td></tr>';
+    
+    const industryKeywords = {
+        'Technology': ['software', 'developer', 'engineer', 'computer', 'tech', 'it', 'data', 'programming', 'web', 'system', 'network', 'cyber'],
+        'Finance': ['bank', 'finance', 'investment', 'audit', 'accountant', 'tax', 'stock', 'fintech', 'insurance', 'commercial'],
+        'Healthcare': ['doctor', 'nurse', 'hospital', 'medicine', 'health', 'clinic', 'medical', 'pharma', 'biology'],
+        'Education': ['teacher', 'professor', 'school', 'university', 'academic', 'tutor', 'education', 'lecture'],
+        'Science': ['research', 'laboratory', 'scientist', 'scientific', 'physics', 'chemistry', 'biology', 'lab'],
+        'Engineering': ['civil', 'mechanical', 'electrical', 'construction', 'structural', 'engineer', 'industrial'],
+        'Marketing': ['marketing', 'sales', 'advertising', 'branding', 'media', 'seo', 'social media', 'content'],
+        'Legal': ['lawyer', 'legal', 'solicitor', 'attorney', 'judge', 'clerk', 'law'],
+        'Arts & Design': ['artist', 'design', 'graphic', 'ui', 'ux', 'creative', 'music', 'creative', 'fashion'],
+        'Business & Management': ['business', 'management', 'administration', 'strategy', 'operations', 'consulting', 'hr', 'project manager', 'mba', 'leadership']
+    };
+
+    try {
+        const response = await fetch('/api/profile', { signal });
+        const data = await response.json();
+        
+        if(data.success && data.data) {
+            const filterProg = document.getElementById('programmeFilter').value.toLowerCase();
+            const filterYear = document.getElementById('yearFilter').value;
+            const filterIndRaw = document.getElementById('industryFilter').value;
+            const filterIndSearch = filterIndRaw.toLowerCase().trim();
+
+            filteredAlumni = data.data.filter(profile => {
+                const degree = (profile.degrees && profile.degrees.length > 0) ? profile.degrees[0] : {};
+                const job = (profile.employmentHistory && profile.employmentHistory.length > 0) ? profile.employmentHistory[0] : {};
+                
+                const progText = (degree.degreeTitle || '').toLowerCase();
+                const progUni = (degree.university || '').toLowerCase();
+                const companyText = (job.company || '').toLowerCase();
+                const roleText = (job.role || '').toLowerCase();
+                const bioText = (profile.bio || '').toLowerCase();
+                const fullName = `${profile.firstName} ${profile.lastName}`.toLowerCase();
+                
+                let yearText = 'N/A';
+                if (degree.completionDate) {
+                    const d = new Date(degree.completionDate);
+                    if (!isNaN(d.getTime())) yearText = d.getFullYear().toString();
+                }
+
+                const searchPool = [companyText, roleText, bioText, progText, progUni, fullName].join(' ').toLowerCase();
+                
+                let match = true;
+                if (filterProg && !progText.includes(filterProg)) match = false;
+                if (filterYear && yearText !== filterYear) match = false;
+                
+                if (filterIndRaw) {
+                    const keywords = industryKeywords[filterIndRaw] || [filterIndSearch];
+                    const hasKeywordMatch = keywords.some(kw => searchPool.includes(kw));
+                    if (!hasKeywordMatch) match = false;
+                }
+
+                profile._derivedProg = degree.degreeTitle || 'N/A';
+                profile._derivedYear = yearText;
+                profile._derivedRole = job.role || 'Not specified';
+                profile._derivedInd = job.company || 'Unknown';
+
+                return match;
+            });
+
+            currentPage = 1;
+            renderTable();
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" class="loading-state alert-error">Failed to synchronise data.</td></tr>';
+        }
+    } catch (e) {
+        if (e.name === 'AbortError') return; // Ignore cancelled fetches
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-state alert-error">Connectivity error encountered.</td></tr>';
+        console.error(e);
+    }
+}
+
+// 4. Export & Presets Logic
+window.exportToCSV = function(e) {
+    if (e) e.preventDefault();
+    if (!filteredAlumni || filteredAlumni.length === 0) {
+        alert("No alumni data matched your filters. Please adjust searches before exporting.");
+        return;
+    }
+
+    try {
+        const timestamp = new Date().toLocaleString();
+        const filters = getFilterSummary();
+        
+        // Institutional Header for CSV
+        let csv = [
+            ['"UNIVERSITY ALUMNI NETWORK REPORT"'],
+            [`"Generated: ${timestamp}"`],
+            [`"Active Filters: ${filters}"`],
+            [`"Total Records: ${filteredAlumni.length}"`],
+            [''], // Empty row
+            ['"Full Name"', '"Programme"', '"Graduation Year"', '"Current Company/Industry"', '"Role"'].join(',')
+        ];
+        
+        filteredAlumni.forEach(a => {
+            const row = [
+                `"${(a.firstName + ' ' + a.lastName).replace(/"/g, '""')}"`,
+                `"${(a._derivedProg || 'N/A').replace(/"/g, '""')}"`,
+                `"${(a._derivedYear || 'N/A').replace(/"/g, '""')}"`,
+                `"${(a._derivedInd || 'N/A').replace(/"/g, '""')}"`,
+                `"${(a._derivedRole || 'N/A').replace(/"/g, '""')}"`
+            ];
+            csv.push(row.join(','));
+        });
+
+        const csvContent = csv.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Alumni_Registry_Export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (err) {
+        console.error("CSV Export Error:", err);
+        alert("An error occurred during CSV generation.");
+    }
+};
+
+window.savePreset = function(e) {
+    if (e) e.preventDefault();
+    const name = prompt("Enter a name for this filter preset (e.g., '2024 Tech Graduates'):");
+    if (!name || name.trim() === '') return;
+
+    const preset = {
+        programme: document.getElementById('programmeFilter').value,
+        year: document.getElementById('yearFilter').value,
+        industry: document.getElementById('industryFilter').value
+    };
+
+    let presets = JSON.parse(localStorage.getItem('alumniPresets') || '{}');
+    presets[name] = preset;
+    localStorage.setItem('alumniPresets', JSON.stringify(presets));
+    
+    updatePresetsList();
+};
+
+window.updatePresetsList = function() {
+    const loader = document.getElementById('presetLoader');
+    if (!loader) return;
+    const presets = JSON.parse(localStorage.getItem('alumniPresets') || '{}');
+    
+    loader.innerHTML = '<option value="">-- Load Preset --</option>';
+    for (const name in presets) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.text = name;
+        loader.appendChild(option);
+    }
+};
+
+window.applyPreset = function(name) {
+    if (!name) return;
+    const presets = JSON.parse(localStorage.getItem('alumniPresets') || '{}');
+    const p = presets[name];
+
+    if (p) {
+        document.getElementById('programmeFilter').value = p.programme;
+        document.getElementById('yearFilter').value = p.year;
+        document.getElementById('industryFilter').value = p.industry;
+        loadAlumni();
+    }
+};
+
+// Initial load and security-compliant event binding
+document.addEventListener('DOMContentLoaded', () => {
+    loadAlumni();
+    updatePresetsList();
+    
+    // 2. Filter Listeners
+    ['programmeFilter', 'yearFilter', 'industryFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', loadAlumni);
+    });
+
+    // 3. Action Button Listeners
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    if (exportCsvBtn) exportCsvBtn.addEventListener('click', (e) => window.exportToCSV(e));
+
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    if (exportPdfBtn) exportPdfBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Populate print-only header elements
+        document.getElementById('printDate').innerText = new Date().toLocaleString();
+        document.getElementById('activeFiltersText').innerText = getFilterSummary();
+        window.print();
+    });
+
+    const savePresetBtn = document.getElementById('savePresetBtn');
+    if (savePresetBtn) savePresetBtn.addEventListener('click', (e) => window.savePreset(e));
+
+    const presetLoader = document.getElementById('presetLoader');
+    if (presetLoader) presetLoader.addEventListener('change', (e) => window.applyPreset(e.target.value));
+
+    const resetBtn = document.getElementById('resetFilters');
+    if (resetBtn) resetBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('filterForm').reset();
+        loadAlumni();
+    });
+});
+</script>

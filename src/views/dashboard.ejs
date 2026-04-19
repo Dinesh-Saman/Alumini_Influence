@@ -1,0 +1,64 @@
+<div class="dashboard-header animate-fade-in">
+    <h1><i class="fa-solid fa-house-chimney"></i> Welcome back, <%= user.email.split('@')[0] %></h1>
+    <p>Data for <%= new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+</div>
+
+<div class="stats-grid mb-4 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="stat-card glass-card">
+        <h3><i class="fa-solid fa-user-graduate"></i> Total Alumni</h3>
+        <p class="stat-value"><%= stats.totalAlumni || 0 %></p>
+    </div>
+    <div class="stat-card glass-card">
+        <h3><i class="fa-solid fa-gavel"></i> Active Bids</h3>
+        <p class="stat-value"><%= stats.activeBids || 0 %></p>
+    </div>
+    <div class="stat-card glass-card">
+        <h3><i class="fa-solid fa-trophy"></i> Highest Bid</h3>
+        <p class="stat-value">£<%= stats.highestBid || 0 %></p>
+    </div>
+</div>
+
+<div class="glass-card mb-4 animate-fade-in" style="animation-delay: 0.2s;">
+    <div class="chart-header">
+        <h3><i class="fa-solid fa-ranking-star"></i> Top Bids</h3>
+        <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light);">Live Ranking</span>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Bidder</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (locals.topBids && locals.topBids.length > 0) { %>
+                    <% locals.topBids.forEach(function(bid) { %>
+                        <tr>
+                            <td><strong><%= bid.user ? bid.user.email : 'Unknown' %></strong></td>
+                            <td style="color: var(--success); font-weight: 700;">£<%= bid.amount %></td>
+                            <td><%= new Date(bid.bidDate).toLocaleDateString() %></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr><td colspan="3" class="loading-state">No bids found.</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="glass-card animate-fade-in" style="animation-delay: 0.3s;">
+    <div class="chart-header">
+        <h3><i class="fa-solid fa-info-circle"></i> Dashboard Overview</h3>
+        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Online</span>
+    </div>
+    <div style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8;">
+        <p>The system is showing the latest alumni information. Highest bid and search data are updated and ready for your review.</p>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <a href="/alumni" class="btn-primary" style="width: auto;"><i class="fa-solid fa-magnifying-glass"></i> Search Alumni</a>
+            <a href="/graphs" class="btn-secondary" style="width: auto; background: var(--glass-bg); border-color: var(--glass-border); color: #fff;"><i class="fa-solid fa-chart-pie"></i> View Graphs</a>
+        </div>
+    </div>
+</div>

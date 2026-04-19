@@ -4,26 +4,27 @@ const User = require('../models/User');
 exports.protect = async (req, res, next) => {
     let token;
 
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
-    ) {
+    // 1. Check Bearer Token (API Context)
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
+    } 
+    // 2. Check Session (Browser Context)
+    else if (req.session && req.session.userId) {
+        req.user = await User.findById(req.session.userId);
+        if (req.user) return next();
     }
 
-    // Make sure token exists
+    // Fallback: If no token and no session
     if (!token) {
-        return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
+        return res.status(401).json({ success: false, message: 'Not authorized: No token or session found.' });
     }
 
     try {
-        // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         req.user = await User.findById(decoded.id);
 
         if (!req.user) {
-            return res.status(401).json({ success: false, message: 'User no longer exists in our database' });
+            return res.status(401).json({ success: false, message: 'User no longer exists.' });
         }
 
         // Global usage logging
@@ -38,7 +39,7 @@ exports.protect = async (req, res, next) => {
 
         next();
     } catch (err) {
-        console.log(err);
-        return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
+        return res.status(401).json({ success: false, message: 'Not authorized: Invalid token.' });
     }
 };
+

@@ -6,6 +6,10 @@ const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
+const session = require('express-session');
+const MongoStore = require('connect-mongo').default;
+const expressLayouts = require('express-ejs-layouts');
+const mongoose = require('mongoose');
 
 dotenv.config();
 
@@ -19,13 +23,25 @@ const app = express();
 const { mongoSanitize, xssSanitize } = require('./src/middleware/sanitize');
 
 // Security Middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+            imgSrc: ["'self'", "data:", "https://ui-avatars.com"],
+            connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
+        },
+    },
+}));
 app.use(cors({
     origin: process.env.CLIENT_URL || '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies for HTML forms
 
 // Rate Limiting
 const generalLimiter = rateLimit({
@@ -48,8 +64,32 @@ app.use('/api/auth', sensitiveLimiter);
 app.use(mongoSanitize); // Prevent NoSQL Injection
 app.use(xssSanitize);   // Escape HTML tags
 
-// Serve static files (uploads)
+// Serve static files (uploads and public folder)
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// EJS View Engine
+app.use(expressLayouts);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/views'));
+app.set('layout', 'layout'); // Set default layout
+
+// Session Middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'secret1234',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        clientPromise: mongoose.connection.asPromise().then(m => m.getClient()),
+        stringify: false,
+    }),
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', 
+        maxAge: 86400000,
+        httpOnly: true, // Prevents client-side JS from accessing the cookie (XSS Protection)
+        sameSite: 'strict' // Robust CSRF protection: Cookie only sent for same-site requests
+    }
+}));
 
 // Routes
 const authRoutes = require('./src/routes/auth');
@@ -65,6 +105,9 @@ app.use('/api/admin', adminRoutes);
 // Public Client API (Protected by API Key)
 // For "Get today's featured alumnus"
 app.use('/api/client', require('./src/routes/client'));
+
+// View Routes for Dashboard Client App
+app.use('/', require('./src/routes/view'));
 
 // Swagger Docs
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));

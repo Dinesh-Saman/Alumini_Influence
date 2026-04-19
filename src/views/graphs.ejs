@@ -1,0 +1,185 @@
+<div class="dashboard-header animate-fade-in">
+    <h1><i class="fa-solid fa-chart-line"></i> Analytics Graphs</h1>
+    <p>View real-time trends and data-driven insights from our alumni network.</p>
+</div>
+
+<div class="charts-grid animate-fade-in">
+    <!-- 1. Skills Gap Analysis -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-microchip"></i> Skills Gap Analysis</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="skillsGapChart" data-filename="Skills_Gap_Analysis">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Identifies independent certifications acquired post-graduation. High percentages signal missing technical topics in the university curriculum.</p>
+        <div class="chart-container" style="height: 220px;">
+            <canvas id="skillsGapChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 2. Career Pathways (Roles) -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-briefcase"></i> Career Pathways</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="rolesChart" data-filename="Career_Pathways">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Distribution of alumni across professional roles. Hover to see the academic background of people in these positions.</p>
+        <div class="chart-container" style="height: 220px;">
+            <canvas id="rolesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 3. Academic Distribution (Degrees) -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-graduation-cap"></i> Academic Distribution</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="careerPathwaysChart" data-filename="Academic_Distribution">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Total alumni count grouped by academic degree programme. Shows current roles of graduates from each programme.</p>
+        <div class="chart-container" style="height: 280px;">
+            <canvas id="careerPathwaysChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 4. Industry Demand Trends -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Industry Demand Trends</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="industryDemandChart" data-filename="Industry_Demand_Trends">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Tracking alumni placement and hiring trends across top global companies and industries by graduation year.</p>
+        <div class="chart-container" style="height: 300px;">
+            <canvas id="industryDemandChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 5. Professional Licences -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-id-card"></i> Professional Licences</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="licencesChart" data-filename="Professional_Licences">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Distribution of alumni across official issuing bodies and professional boards (e.g., Engineering Council, ACCA).</p>
+        <div class="chart-container" style="height: 380px;">
+            <canvas id="licencesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 6. Professional Courses -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-certificate"></i> Professional Courses</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="coursesChart" data-filename="Professional_Courses">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Distribution of independent professional courses completed. High engagement usually correlates with specific career trajectories.</p>
+        <div class="chart-container" style="height: 380px;">
+            <canvas id="coursesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 7. Employment Placement -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-user-check"></i> Top Employers</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="placementLineChart" data-filename="Top_Employers">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Ranking of the top institutional partners and corporate entities hiring our alumni network.</p>
+        <div class="chart-container" style="height: 380px;">
+            <canvas id="placementLineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 8. Industry Competency Map -->
+    <div class="glass-card">
+        <div class="chart-header">
+            <h3><i class="fa-solid fa-compass-drafting"></i> Industry Competency Map</h3>
+            <button class="btn-download btn-download-chart" data-chart-id="competencyRadarChart" data-filename="Industry_Competitiveness">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+        <p class="chart-desc">Multi-dimensional comparison of top industries across professional pillars: Certifications, Courses, Licenses, and Experience.</p>
+        <div class="chart-container" style="height: 420px;">
+            <canvas id="competencyRadarChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="/js/charts.js"></script>
+
+<style>
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.chart-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.chart-desc {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.btn-download {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-download:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>

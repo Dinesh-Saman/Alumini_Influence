@@ -20,6 +20,10 @@ const ApiKeySchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    permissions: {
+        type: [String],
+        default: [],
+    },
     usageStats: [
         {
             date: { type: Date, default: Date.now },
