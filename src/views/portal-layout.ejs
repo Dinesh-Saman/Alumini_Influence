@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Alumni Influencers Portal</title>
+    <!-- Modern Font: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Specific Portal Adjustments */
+        .portal-navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .portal-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .portal-brand i { color: #f59e0b; } /* Amber branding for alumni */
+
+        .portal-nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .portal-nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .portal-nav-links a:hover, .portal-nav-links a.active {
+            color: #f59e0b;
+        }
+
+        .portal-nav-links a i {
+            margin-right: 6px;
+        }
+
+        .portal-main {
+            padding-top: 5rem;
+            margin: 0 auto;
+            width: 75%;
+            max-width: 1600px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            min-height: calc(100vh - 60px);
+        }
+    </style>
+</head>
+<body style="background: #0f172a; color: #f8fafc; font-family: 'Outfit', sans-serif;">
+
+    <% if (title !== 'Alumni Login' && title !== 'Alumni Register') { %>
+        <nav class="portal-navbar">
+            <div class="portal-brand">
+                <i class="fa-solid fa-crown"></i> Alumni Portal
+            </div>
+            <div class="portal-nav-links">
+                <a href="/portal/dashboard" class="<%= title === 'Alumni Dashboard' ? 'active' : '' %>"><i class="fa-solid fa-home"></i> Home</a>
+                <a href="/portal/profile" class="<%= title === 'My Profile' ? 'active' : '' %>"><i class="fa-solid fa-user"></i> My Profile</a>
+                <a href="/portal/bids" class="<%= title === 'Blind Bidding' ? 'active' : '' %>"><i class="fa-solid fa-gavel"></i> Bidding</a>
+                <a href="/portal/logout" style="color: #f43f5e;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+        
+        <main class="portal-main">
+            <%- body %>
+        </main>
+    <% } else { %>
+        <!-- No navbar for Login & Register -->
+        <%- body %>
+    <% } %>
+
+</body>
+</html>

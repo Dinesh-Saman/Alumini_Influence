@@ -1,0 +1,26 @@
+<div style="text-align: center; margin-top: 5rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Welcome to the Alumni Portal</h1>
+    <p style="color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+        You have successfully logged in! We are currently assembling your personal profile management and blind bidding arenas.
+    </p>
+    
+    <div style="margin-top: 3rem; display: flex; justify-content: center; gap: 2rem;">
+        <div class="glass-card" style="width: 300px; padding: 2rem; border-top: 4px solid #f59e0b; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+            <div style="text-align: center;">
+                <i class="fa-solid fa-user" style="font-size: 2rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+                <h3>Profile Hub</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; margin-bottom: 1.5rem;">Create and manage your professional visibility.</p>
+            </div>
+            <a href="/portal/profile" style="display: inline-block; padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; text-decoration: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; transition: transform 0.2s ease;"><%= hasProfile ? 'Manage Profile' : 'Create Profile' %></a>
+        </div>
+        
+        <div class="glass-card" style="width: 300px; padding: 2rem; border-top: 4px solid #8b5cf6; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+            <div style="text-align: center;">
+                <i class="fa-solid fa-gavel" style="font-size: 2rem; color: #8b5cf6; margin-bottom: 1rem;"></i>
+                <h3>Blind Gamified Bidding</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; margin-bottom: 1.5rem;">Access the daily leaderboard blind auction system.</p>
+            </div>
+            <a href="/portal/bidding" style="display: inline-block; padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; text-decoration: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; transition: transform 0.2s ease;">Enter Arena</a>
+        </div>
+    </div>
+</div>

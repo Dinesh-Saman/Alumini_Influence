@@ -1,0 +1,218 @@
+<div class="auth-wrapper">
+    <div class="auth-card glass-card animate-fade-in">
+        <div class="auth-header" id="authHeader">
+            <div class="auth-logo">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <h1>Join Data Portal</h1>
+            <p>Alumni Networking & Analytics Hub</p>
+        </div>
+        
+        <div id="alertBox"></div>
+
+        <form id="registerForm" class="auth-form">
+            <div class="form-group mb-4">
+                <label><i class="fa-solid fa-envelope"></i> Alumni Email</label>
+                <input type="email" id="email" required placeholder="name@university.ac.uk" class="glass-input">
+                <div style="text-align: left; margin-top: 0.25rem;">
+                    <small style="color: var(--text-muted); font-size: 0.75rem;">Must be .ac.uk or .edu domain</small>
+                </div>
+            </div>
+            <div class="form-group mb-4">
+                <label><i class="fa-solid fa-lock"></i> Create Password</label>
+                <input type="password" id="password" required minlength="8" placeholder="Minimum 8 characters" class="glass-input">
+            </div>
+            
+            <button type="submit" class="btn-primary auth-btn" id="regBtn">
+                <span>Join Alumni Network</span>
+                <i class="fa-solid fa-user-plus"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Verification Required</p>
+            <div class="auth-links">
+                Already have an account? <a href="/portal/login">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('regBtn');
+    const alertBox = document.getElementById('alertBox');
+    const header = document.getElementById('authHeader');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>Processing...</span> <i class="fa-solid fa-circle-notch fa-spin"></i>';
+    alertBox.innerHTML = '';
+
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        
+        header.style.marginBottom = "0.75rem";
+
+        if (data.success) {
+            alertBox.innerHTML = '<div class="alert alert-success" style="margin-bottom: 0.75rem; padding: 0.6rem 1rem;"><i class="fa-solid fa-circle-check"></i> Account created! Verify your email to login.</div>';
+            setTimeout(() => window.location.href = '/portal/login', 3000);
+        } else {
+            alertBox.innerHTML = `<div class="alert alert-error" style="margin-bottom: 0.75rem; padding: 0.6rem 1rem;"><i class="fa-solid fa-circle-exclamation"></i> ${data.message || 'Registration failed'}</div>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span>Join Alumni Network</span> <i class="fa-solid fa-user-plus"></i>';
+        }
+    } catch (err) {
+        alertBox.innerHTML = '<div class="alert alert-error" style="margin-bottom: 0.75rem; padding: 0.6rem 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Connectivity error.</div>';
+        btn.disabled = false;
+        btn.innerHTML = '<span>Join Alumni Network</span> <i class="fa-solid fa-user-plus"></i>';
+    }
+});
+</script>
+
+<style>
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.1), transparent),
+                radial-gradient(circle at bottom left, rgba(217, 119, 6, 0.1), transparent);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 1.5rem 2rem !important;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-header { margin-bottom: 1.25rem; transition: all 0.3s ease; }
+
+.auth-logo {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+}
+
+.auth-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.15rem;
+    letter-spacing: -0.5px;
+}
+
+.auth-header p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.glass-input {
+    background: rgba(15, 23, 42, 0.4) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    width: 100%;
+    transition: all 0.3s ease !important;
+}
+
+.glass-input:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+.btn-primary.auth-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    width: 100%;
+    padding: 0.8rem !important;
+    font-size: 0.95rem !important;
+    margin-top: 0.25rem;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+}
+
+.auth-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.auth-footer p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.auth-links {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.auth-links a {
+    color: #f59e0b;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    border-radius: 12px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.alert-error {
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    color: #f43f5e;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>

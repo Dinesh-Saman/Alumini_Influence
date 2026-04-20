@@ -1,0 +1,138 @@
+<div class="bidding-container animate-fade-in" style="max-width: 800px; margin: 0 auto; background: rgba(15, 23, 42, 0.6); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
+            <a href="/portal/dashboard" style="display: inline-flex; justify-content: center; align-items: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 50%; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: #f8fafc; line-height: 1;"><i class="fa-solid fa-gavel" style="color: #8b5cf6;"></i> Blind Gamified Bidding</h1>
+                <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 0;">Secure tomorrow's top featured slot on the public "Alumni of the Day" wall.</p>
+            </div>
+        </div>
+    </div>
+
+    <% if (!profile) { %>
+        <div style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 2rem; border-radius: 12px; text-align: center;">
+            <i class="fa-solid fa-lock" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Profile Required</h3>
+            <p>You must construct your comprehensive Alumni Profile before you can participate in blind bidding.</p>
+            <a href="/portal/profile" style="display: inline-block; margin-top: 1.5rem; background: #f43f5e; color: #fff; padding: 0.8rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600;">Create Profile Now</a>
+        </div>
+    <% } else { %>
+
+    <div id="alertBox"></div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+        
+        <!-- Status Card -->
+        <div class="glass-card" style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center; display: flex; flex-direction: column; justify-content: center;">
+            <p style="color: #94a3b8; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Current Status</p>
+            <div id="statusIndicator" style="font-size: 1.5rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: center; gap: 0.8rem;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+            </div>
+            <p id="slotsRemainingTxt" style="color: #cbd5e1; font-size: 0.9rem; margin-top: 1.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 6px;"></p>
+        </div>
+
+        <!-- Bidding Control -->
+        <div class="glass-card" style="background: rgba(139, 92, 246, 0.05); padding: 2rem; border-radius: 16px; border: 1px solid rgba(139, 92, 246, 0.2);">
+            <h3 style="color: #8b5cf6; font-size: 1.2rem; margin-bottom: 0.5rem;">Place a Bid</h3>
+            <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 1.5rem;">Higher bids override previous ones. Highest bid at midnight wins. Bid amounts remain hidden.</p>
+            
+            <form id="bidForm">
+                <div style="position: relative; margin-bottom: 1.5rem;">
+                    <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #cbd5e1; font-size: 1.2rem; font-weight: 600;">£</span>
+                    <input type="number" id="bidAmount" min="1" step="0.01" required placeholder="0.00" class="form-input" style="padding-left: 2.5rem; font-size: 1.5rem; font-weight: 600; background: rgba(0,0,0,0.3); border-color: rgba(139, 92, 246, 0.3); color: #ffffff;">
+                </div>
+                <button type="submit" id="bidBtn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; border: none; padding: 1rem; border-radius: 8px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(139, 92, 246, 0.3)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Submit Blind Bid
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rule Set -->
+    <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #f59e0b;">
+        <h4 style="color: #f59e0b; margin-bottom: 0.5rem;"><i class="fa-solid fa-scale-balanced"></i> Fair Play Rules</h4>
+        <ul style="color: #94a3b8; font-size: 0.9rem; padding-left: 1.5rem; line-height: 1.6; margin: 0;">
+            <li>Maximum of 3 appearances allowed per calendar month.</li>
+            <li>Users who attend alumni events unlock a bonus 4th appearance.</li>
+            <li>All auctions freeze precisely at <b>Midnight</b> daily.</li>
+            <li>The system will dynamically tell you if you are being outbid, but competitors' exact prices are heavily encrypted and never publicly broadcast.</li>
+        </ul>
+    </div>
+    
+    <% } %>
+
+</div>
+
+<% if (profile) { %>
+<script>
+    const alertBox = document.getElementById('alertBox');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const slotsRemainingTxt = document.getElementById('slotsRemainingTxt');
+    
+    async function loadBidStatus() {
+        try {
+            const res = await fetch('/api/bids/status');
+            const data = await res.json();
+            
+            if (data.success) {
+                const { hasBid, bidStatus, remainingWinsThisMonth, winsThisMonth, bonusSlotActive } = data.data;
+                const maxWins = bonusSlotActive ? 4 : 3;
+
+                // Update Slots Remaining
+                slotsRemainingTxt.innerHTML = `<i class="fa-solid fa-calendar-check"></i> You have <b>${remainingWinsThisMonth}</b> / ${maxWins} featured wins left this month`;
+                
+                // Update Indicator State
+                if (!hasBid) {
+                    statusIndicator.innerHTML = `<span style="color: #94a3b8;"><i class="fa-solid fa-moon"></i> No Active Bid</span>`;
+                } else if (bidStatus === 'Winning') {
+                    statusIndicator.innerHTML = `<span style="color: #10b981; text-shadow: 0 0 10px rgba(16,185,129,0.3);"><i class="fa-solid fa-crown" style="color:#f59e0b"></i> WINNING FOREFRONT</span>`;
+                } else {
+                    statusIndicator.innerHTML = `<span style="color: #f43f5e;"><i class="fa-solid fa-arrow-trend-down"></i> Currently Outbid</span>`;
+                }
+            } else {
+                statusIndicator.innerText = "Error loading status";
+            }
+        } catch(e) {
+            statusIndicator.innerText = "Connectivity Error";
+        }
+    }
+
+    document.getElementById('bidForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('bidBtn');
+        const amount = document.getElementById('bidAmount').value;
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        alertBox.innerHTML = '';
+        
+        try {
+            const res = await fetch('/api/bids', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: parseFloat(amount) })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                alertBox.innerHTML = `<div style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 2rem;"><i class="fa-solid fa-check-circle"></i> Bid of £${amount} securely locked in!</div>`;
+                document.getElementById('bidAmount').value = '';
+                loadBidStatus(); // Refresh status instantly
+            } else {
+                alertBox.innerHTML = `<div style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 2rem;"><i class="fa-solid fa-circle-exclamation"></i> ${data.message}</div>`;
+            }
+        } catch(err) {
+            alertBox.innerHTML = `<div style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 2rem;"><i class="fa-solid fa-triangle-exclamation"></i> Network error. Please try again.</div>`;
+        }
+        
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+
+    // Initial Load
+    document.addEventListener("DOMContentLoaded", loadBidStatus);
+</script>
+<% } %>

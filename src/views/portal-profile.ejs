@@ -1,0 +1,433 @@
+<div class="profile-container animate-fade-in" style="max-width: 100%; margin: 0 auto; background: rgba(15, 23, 42, 0.6); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
+            <a href="/portal/dashboard" style="display: inline-flex; justify-content: center; align-items: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 50%; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s ease; margin-top: 2px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: #f8fafc; line-height: 1;"><i class="fa-solid fa-address-card" style="color: #f59e0b;"></i> <%= profile ? 'Update your Alumni Profile' : 'Create your Alumni Profile' %></h1>
+                <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 0;">Manage all professional tracking metrics for analytics</p>
+            </div>
+        </div>
+        <% if (profile) { %>
+            <button id="deleteProfileBtn" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                <i class="fa-solid fa-trash"></i> Delete
+            </button>
+        <% } %>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <form id="profileForm">
+        <!-- 1. CORE -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">1. Core Identity</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div>
+                <label style="display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.9rem;">First Name *</label>
+                <input type="text" id="firstName" required value="<%= profile ? profile.firstName : '' %>" class="form-input">
+            </div>
+            <div>
+                <label style="display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.9rem;">Last Name *</label>
+                <input type="text" id="lastName" required value="<%= profile ? profile.lastName : '' %>" class="form-input">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.9rem;">LinkedIn URL</label>
+            <input type="url" id="linkedinUrl" value="<%= profile && profile.linkedinUrl ? profile.linkedinUrl : '' %>" class="form-input">
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.9rem;">Professional Bio</label>
+            <textarea id="bio" rows="3" class="form-input" style="resize: vertical;"><%= profile && profile.bio ? profile.bio : '' %></textarea>
+        </div>
+
+        <!-- 2. DEGREES -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">2. Academic Degrees</h3>
+        <div id="degreesContainer" style="margin-bottom: 1rem;">
+            <% if (profile && profile.degrees && profile.degrees.length > 0) { %>
+                <% profile.degrees.forEach((deg) => { %>
+                    <div class="degree-entry dynamic-entry">
+                        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+                        <div class="grid-2">
+                            <div><label>Degree Title *</label><input type="text" class="deg-title form-input" value="<%= deg.degreeTitle %>" required></div>
+                            <div><label>University *</label><input type="text" class="deg-uni form-input" value="<%= deg.university %>" required></div>
+                            <div><label>Completion Date</label><input type="date" class="deg-date form-input" value="<%= deg.completionDate ? new Date(deg.completionDate).toISOString().split('T')[0] : '' %>"></div>
+                            <div><label>University Official URL</label><input type="url" class="deg-url form-input" value="<%= deg.officialUrl || '' %>"></div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+        <button type="button" class="add-btn" id="addDegreeBtn"><i class="fa-solid fa-plus"></i> Add Degree</button>
+
+        <!-- 3. CERTIFICATIONS -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">3. Certifications</h3>
+        <div id="certsContainer" style="margin-bottom: 1rem;">
+            <% if (profile && profile.certifications && profile.certifications.length > 0) { %>
+                <% profile.certifications.forEach((cert) => { %>
+                    <div class="cert-entry dynamic-entry">
+                        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+                        <div class="grid-2">
+                            <div><label>Certification Name *</label><input type="text" class="cert-name form-input" value="<%= cert.name %>" required></div>
+                            <div><label>Issuing Organization *</label><input type="text" class="cert-org form-input" value="<%= cert.issuingOrganization %>" required></div>
+                            <div><label>Completion Date</label><input type="date" class="cert-date form-input" value="<%= cert.completionDate ? new Date(cert.completionDate).toISOString().split('T')[0] : '' %>"></div>
+                            <div><label>Credential URL</label><input type="url" class="cert-url form-input" value="<%= cert.credentialUrl || '' %>"></div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+        <button type="button" class="add-btn" id="addCertBtn"><i class="fa-solid fa-plus"></i> Add Certification</button>
+
+        <!-- 4. LICENCES -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">4. Professional Licences</h3>
+        <div id="licencesContainer" style="margin-bottom: 1rem;">
+            <% if (profile && profile.licences && profile.licences.length > 0) { %>
+                <% profile.licences.forEach((lic) => { %>
+                    <div class="licence-entry dynamic-entry">
+                        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+                        <div class="grid-2">
+                            <div><label>Licence Name *</label><input type="text" class="licence-name form-input" value="<%= lic.name %>" required></div>
+                            <div><label>Issuing Body *</label><input type="text" class="licence-body form-input" value="<%= lic.issuingBody %>" required></div>
+                            <div><label>Completion Date</label><input type="date" class="licence-date form-input" value="<%= lic.completionDate ? new Date(lic.completionDate).toISOString().split('T')[0] : '' %>"></div>
+                            <div><label>Licence URL</label><input type="url" class="licence-url form-input" value="<%= lic.licenceUrl || '' %>"></div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+        <button type="button" class="add-btn" id="addLicenceBtn"><i class="fa-solid fa-plus"></i> Add Licence</button>
+
+        <!-- 5. COURSES -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">5. Professional Courses</h3>
+        <div id="coursesContainer" style="margin-bottom: 1rem;">
+            <% if (profile && profile.professionalCourses && profile.professionalCourses.length > 0) { %>
+                <% profile.professionalCourses.forEach((crs) => { %>
+                    <div class="course-entry dynamic-entry">
+                        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+                        <div class="grid-2">
+                            <div><label>Course Name *</label><input type="text" class="course-name form-input" value="<%= crs.courseName %>" required></div>
+                            <div><label>Provider *</label><input type="text" class="course-provider form-input" value="<%= crs.provider %>" required></div>
+                            <div><label>Completion Date</label><input type="date" class="course-date form-input" value="<%= crs.completionDate ? new Date(crs.completionDate).toISOString().split('T')[0] : '' %>"></div>
+                            <div><label>Course URL</label><input type="url" class="course-url form-input" value="<%= crs.courseUrl || '' %>"></div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+        <button type="button" class="add-btn" id="addCourseBtn"><i class="fa-solid fa-plus"></i> Add Course</button>
+
+        <!-- 6. EMPLOYMENT -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">6. Employment History</h3>
+        <div id="jobsContainer" style="margin-bottom: 1rem;">
+            <% if (profile && profile.employmentHistory && profile.employmentHistory.length > 0) { %>
+                <% profile.employmentHistory.forEach((job) => { %>
+                    <div class="job-entry dynamic-entry">
+                        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+                        <div class="grid-2">
+                            <div><label>Role / Title *</label><input type="text" class="job-role form-input" value="<%= job.role %>" required></div>
+                            <div><label>Company *</label><input type="text" class="job-company form-input" value="<%= job.company %>" required></div>
+                            <div><label>Start Date *</label><input type="date" class="job-start form-input" value="<%= job.startDate ? new Date(job.startDate).toISOString().split('T')[0] : '' %>" required></div>
+                            <div><label>End Date</label><input type="date" class="job-end form-input" value="<%= job.endDate ? new Date(job.endDate).toISOString().split('T')[0] : '' %>" <%= job.current ? 'disabled style="opacity:0.5;"' : '' %>></div>
+                            <div>
+                                <label>Current Role?</label>
+                                <select class="job-current form-input">
+                                    <option value="true" <%= job.current ? 'selected' : '' %>>Yes</option>
+                                    <option value="false" <%= !job.current ? 'selected' : '' %>>No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+        <button type="button" class="add-btn" id="addJobBtn"><i class="fa-solid fa-plus"></i> Add Job</button>
+
+        <!-- SUBMIT -->
+        <div style="display: flex; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; margin-top: 2rem;">
+            <button type="submit" id="saveBtn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 1rem 3rem; border-radius: 8px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                <i class="fa-solid fa-floppy-disk"></i> <%= profile ? 'Save Profile Details' : 'Publish Profile' %>
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-input {
+    width: 100%; 
+    background: rgba(15, 23, 42, 0.8); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    color: white; 
+    padding: 0.8rem; 
+    border-radius: 6px;
+    font-size: 1.05rem;
+}
+
+/* Force standard browser Calendar UI to render white to match dark theme */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.dynamic-entry {
+    background: rgba(0,0,0,0.2); 
+    padding: 1.5rem; 
+    border-radius: 8px; 
+    margin-bottom: 1rem; 
+    position: relative; 
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.remove-btn {
+    position: absolute; right: 10px; top: 10px; background: none; border: none; color: #f43f5e; cursor: pointer;
+}
+.grid-2 {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+.grid-2 label {
+    font-size: 0.95rem; color: #94a3b8; display: block; margin-bottom: 0.3rem; font-weight: 500;
+}
+.add-btn {
+    background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px dashed rgba(245, 158, 11, 0.3); width: 100%; padding: 0.8rem; border-radius: 8px; cursor: pointer; margin-bottom: 2rem; font-size: 1.05rem; font-weight: 600;
+}
+</style>
+
+<script>
+function addDegree() {
+    const container = document.getElementById('degreesContainer');
+    const entry = document.createElement('div');
+    entry.className = 'degree-entry dynamic-entry';
+    entry.innerHTML = `
+        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+        <div class="grid-2">
+            <div><label>Degree Title *</label><input type="text" class="deg-title form-input" required></div>
+            <div><label>University *</label><input type="text" class="deg-uni form-input" required></div>
+            <div><label>Completion Date</label><input type="date" class="deg-date form-input"></div>
+            <div><label>University Official URL</label><input type="url" class="deg-url form-input"></div>
+        </div>`;
+    container.appendChild(entry);
+}
+
+function addCert() {
+    const container = document.getElementById('certsContainer');
+    const entry = document.createElement('div');
+    entry.className = 'cert-entry dynamic-entry';
+    entry.innerHTML = `
+        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+        <div class="grid-2">
+            <div><label>Certification Name *</label><input type="text" class="cert-name form-input" required></div>
+            <div><label>Issuing Organization *</label><input type="text" class="cert-org form-input" required></div>
+            <div><label>Completion Date</label><input type="date" class="cert-date form-input"></div>
+            <div><label>Credential URL</label><input type="url" class="cert-url form-input"></div>
+        </div>`;
+    container.appendChild(entry);
+}
+
+function addLicence() {
+    const container = document.getElementById('licencesContainer');
+    const entry = document.createElement('div');
+    entry.className = 'licence-entry dynamic-entry';
+    entry.innerHTML = `
+        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+        <div class="grid-2">
+            <div><label>Licence Name *</label><input type="text" class="licence-name form-input" required></div>
+            <div><label>Issuing Body *</label><input type="text" class="licence-body form-input" required></div>
+            <div><label>Completion Date</label><input type="date" class="licence-date form-input"></div>
+            <div><label>Licence URL</label><input type="url" class="licence-url form-input"></div>
+        </div>`;
+    container.appendChild(entry);
+}
+
+function addCourse() {
+    const container = document.getElementById('coursesContainer');
+    const entry = document.createElement('div');
+    entry.className = 'course-entry dynamic-entry';
+    entry.innerHTML = `
+        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+        <div class="grid-2">
+            <div><label>Course Name *</label><input type="text" class="course-name form-input" required></div>
+            <div><label>Provider *</label><input type="text" class="course-provider form-input" required></div>
+            <div><label>Completion Date</label><input type="date" class="course-date form-input"></div>
+            <div><label>Course URL</label><input type="url" class="course-url form-input"></div>
+        </div>`;
+    container.appendChild(entry);
+}
+
+function addJob() {
+    const container = document.getElementById('jobsContainer');
+    const entry = document.createElement('div');
+    entry.className = 'job-entry dynamic-entry';
+    entry.innerHTML = `
+        <button type="button" class="remove-btn"><i class="fa-solid fa-times"></i></button>
+        <div class="grid-2">
+            <div><label>Role / Title *</label><input type="text" class="job-role form-input" required></div>
+            <div><label>Company *</label><input type="text" class="job-company form-input" required></div>
+            <div><label>Start Date *</label><input type="date" class="job-start form-input" required></div>
+            <div><label>End Date</label><input type="date" class="job-end form-input" disabled style="opacity:0.5;"></div>
+            <div>
+                <label>Current Role?</label>
+                <select class="job-current form-input">
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+        </div>`;
+    container.appendChild(entry);
+}
+
+// Global Delegation for Remove Buttons
+document.getElementById('profileForm').addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('.remove-btn');
+    if (removeBtn) {
+        removeBtn.parentElement.remove();
+    }
+});
+
+// Global Delegation for Job Current Toggles
+document.getElementById('profileForm').addEventListener('change', (e) => {
+    if (e.target.classList.contains('job-current')) {
+        const entry = e.target.closest('.job-entry');
+        const endDateInput = entry.querySelector('.job-end');
+        if (e.target.value === 'true') {
+            endDateInput.value = '';
+            endDateInput.disabled = true;
+            endDateInput.style.opacity = '0.5';
+        } else {
+            endDateInput.disabled = false;
+            endDateInput.style.opacity = '1';
+        }
+    }
+});
+
+// Bind Add buttons explicitly safely
+document.getElementById('addDegreeBtn').addEventListener('click', addDegree);
+document.getElementById('addCertBtn').addEventListener('click', addCert);
+document.getElementById('addLicenceBtn').addEventListener('click', addLicence);
+document.getElementById('addCourseBtn').addEventListener('click', addCourse);
+document.getElementById('addJobBtn').addEventListener('click', addJob);
+
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = document.getElementById('profileForm');
+    const submitBtns = form.querySelectorAll('button[type="submit"]');
+    const alertBox = document.getElementById('alertBox');
+    
+    // Explicitly enforce HTML5 native validation before payload parsing
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const payload = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        linkedinUrl: document.getElementById('linkedinUrl').value.trim(),
+        bio: document.getElementById('bio').value.trim(),
+        
+        degrees: Array.from(document.querySelectorAll('.degree-entry')).map(entry => ({
+            degreeTitle: entry.querySelector('.deg-title').value.trim(),
+            university: entry.querySelector('.deg-uni').value.trim(),
+            completionDate: entry.querySelector('.deg-date').value || null,
+            officialUrl: entry.querySelector('.deg-url').value.trim() || null
+        })),
+        
+        certifications: Array.from(document.querySelectorAll('.cert-entry')).map(entry => ({
+            name: entry.querySelector('.cert-name').value.trim(),
+            issuingOrganization: entry.querySelector('.cert-org').value.trim(),
+            completionDate: entry.querySelector('.cert-date').value || null,
+            credentialUrl: entry.querySelector('.cert-url').value.trim() || null
+        })),
+
+        licences: Array.from(document.querySelectorAll('.licence-entry')).map(entry => ({
+            name: entry.querySelector('.licence-name').value.trim(),
+            issuingBody: entry.querySelector('.licence-body').value.trim(),
+            completionDate: entry.querySelector('.licence-date').value || null,
+            licenceUrl: entry.querySelector('.licence-url').value.trim() || null
+        })),
+
+        professionalCourses: Array.from(document.querySelectorAll('.course-entry')).map(entry => ({
+            courseName: entry.querySelector('.course-name').value.trim(),
+            provider: entry.querySelector('.course-provider').value.trim(),
+            completionDate: entry.querySelector('.course-date').value || null,
+            courseUrl: entry.querySelector('.course-url').value.trim() || null
+        })),
+
+        employmentHistory: Array.from(document.querySelectorAll('.job-entry')).map(entry => {
+            const isCurrent = entry.querySelector('.job-current').value === 'true';
+            return {
+                role: entry.querySelector('.job-role').value.trim(),
+                company: entry.querySelector('.job-company').value.trim(),
+                startDate: entry.querySelector('.job-start').value,
+                endDate: isCurrent ? null : (entry.querySelector('.job-end').value || null),
+                current: isCurrent
+            };
+        })
+    };
+
+    submitBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+    });
+    alertBox.innerHTML = ''; // clear previous errors
+    
+    try {
+        const response = await fetch('/api/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alertBox.innerHTML = '<div style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 1.1rem;"><i class="fa-solid fa-check-circle"></i> <strong>Profile Data Successfully Saved!</strong></div>';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            submitBtns.forEach(btn => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved Successfully!';
+                btn.style.background = 'rgba(16, 185, 129, 0.9)';
+            });
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            // Render specific field errors if returned by Joi backend validation
+            let errorHtml = `<div style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;"><i class="fa-solid fa-circle-exclamation"></i> <strong>Validation Error:</strong><ul style="margin-top: 0.5rem; padding-left: 1.5rem;">`;
+            
+            if (data.errors && Array.isArray(data.errors)) {
+                data.errors.forEach(err => {
+                    errorHtml += `<li>${err.message || 'Invalid field data'}</li>`;
+                });
+            } else {
+                errorHtml += `<li>${data.message || 'Please check all required fields and confirm URLs are valid.'}</li>`;
+            }
+            errorHtml += `</ul></div>`;
+            
+            alertBox.innerHTML = errorHtml;
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to view errors
+            submitBtns.forEach(btn => {
+                btn.disabled = false;
+                btn.innerHTML = btn.id === 'saveBtn' ? '<i class="fa-solid fa-floppy-disk"></i> Save Profile Details' : '<i class="fa-solid fa-cloud-arrow-up"></i> Quick Save Progress';
+            });
+        }
+    } catch (err) {
+        alertBox.innerHTML = '<div style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> Connectivity Error. Please try again.</div>';
+        submitBtns.forEach(btn => {
+            btn.disabled = false;
+            btn.innerHTML = btn.id === 'saveBtn' ? '<i class="fa-solid fa-floppy-disk"></i> Save Profile Details' : '<i class="fa-solid fa-cloud-arrow-up"></i> Quick Save Progress';
+        });
+    }
+});
+
+const deleteBtn = document.getElementById('deleteProfileBtn');
+if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+        if (!confirm('Are you certain you want to delete your entire profile?')) return;
+        deleteBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/api/profile', { method: 'DELETE' });
+            if (response.ok) window.location.reload();
+            else alert('Failed to delete profile.');
+        } catch (err) {
+            alert('Error deleting profile.');
+        }
+    });
+}
+</script>

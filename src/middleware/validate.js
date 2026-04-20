@@ -96,9 +96,9 @@ const placeBidSchema = Joi.object({
 // Profile Schema
 
 const commonUrlMessages = {
-    'string.uri': '{#label} must be a valid URL',
-    'string.uriCustomScheme': '{#label} must start with http or https',
-    'string.uriRelativeOnly': '{#label} cannot be a relative path',
+    'string.uri': 'please provide valid email',
+    'string.uriCustomScheme': 'please provide valid email',
+    'string.uriRelativeOnly': 'please provide valid email',
 };
 
 const profileSchema = Joi.object({
@@ -117,7 +117,7 @@ const profileSchema = Joi.object({
     degrees: Joi.array().items(Joi.object({
         degreeTitle: Joi.string().required().label('Degree Title'),
         university: Joi.string().required().label('University'),
-        completionDate: Joi.date().label('Completion Date'),
+        completionDate: Joi.date().label('Degree Completion Date'),
         officialUrl: Joi.string()
             .uri({ scheme: ['http', 'https'] })
             .allow('', null)
@@ -127,7 +127,7 @@ const profileSchema = Joi.object({
     certifications: Joi.array().items(Joi.object({
         name: Joi.string().required().label('Certification Name'),
         issuingOrganization: Joi.string().required().label('Issuing Organization'),
-        completionDate: Joi.date().label('Completion Date'),
+        completionDate: Joi.date().label('Certification Completion Date'),
         credentialUrl: Joi.string()
             .uri({ scheme: ['http', 'https'] })
             .allow('', null)
@@ -137,7 +137,7 @@ const profileSchema = Joi.object({
     licences: Joi.array().items(Joi.object({
         name: Joi.string().required().label('Licence Name'),
         issuingBody: Joi.string().required().label('Issuing Body'),
-        completionDate: Joi.date().label('Completion Date'),
+        completionDate: Joi.date().label('Licence Completion Date'),
         licenceUrl: Joi.string()
             .uri({ scheme: ['http', 'https'] })
             .allow('', null)
@@ -147,7 +147,7 @@ const profileSchema = Joi.object({
     professionalCourses: Joi.array().items(Joi.object({
         courseName: Joi.string().required().label('Course Name'),
         provider: Joi.string().required().label('Provider'),
-        completionDate: Joi.date().label('Completion Date'),
+        completionDate: Joi.date().label('Course Completion Date'),
         courseUrl: Joi.string()
             .uri({ scheme: ['http', 'https'] })
             .allow('', null)

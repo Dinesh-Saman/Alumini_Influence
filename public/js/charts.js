@@ -2,6 +2,7 @@
 Chart.defaults.color = '#94a3b8'; // --text-muted
 Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)'; // --glass-border
 Chart.defaults.font.family = "'Outfit', sans-serif";
+Chart.defaults.font.size = 15; // Global font size for all charts (labels, ticks, legend)
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {

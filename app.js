@@ -106,6 +106,9 @@ app.use('/api/admin', adminRoutes);
 // For "Get today's featured alumnus"
 app.use('/api/client', require('./src/routes/client'));
 
+// View Routes for Alumni Portal
+app.use('/portal', require('./src/routes/portal'));
+
 // View Routes for Dashboard Client App
 app.use('/', require('./src/routes/view'));
 
