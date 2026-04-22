@@ -1,0 +1,196 @@
+<div class="dashboard-header animate-fade-in">
+    <h1><i class="fa-solid fa-chart-bar"></i> Usage Statistics</h1>
+    <p>Monitor login activity, API token usage, and endpoint access patterns across the platform.</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="animate-fade-in" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #6366f1; text-align: center;">
+        <i class="fa-solid fa-list-check" style="font-size: 2rem; color: #6366f1; margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">Total Requests</p>
+        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= logs.length %></h2>
+    </div>
+    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #10b981; text-align: center;">
+        <i class="fa-solid fa-id-badge" style="font-size: 2rem; color: #10b981; margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">JWT / Session</p>
+        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= jwtCount %></h2>
+    </div>
+    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #f59e0b; text-align: center;">
+        <i class="fa-solid fa-key" style="font-size: 2rem; color: #f59e0b; margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">API Key Calls</p>
+        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= apiKeyCount %></h2>
+    </div>
+    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #8b5cf6; text-align: center;">
+        <i class="fa-solid fa-users" style="font-size: 2rem; color: #8b5cf6; margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">Tracked Users</p>
+        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= users.length %></h2>
+    </div>
+</div>
+
+<div class="responsive-grid-2" style="margin-bottom: 2rem;">
+
+    <!-- Top Endpoints -->
+    <div class="glass-card animate-fade-in" style="padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--text-primary);"><i class="fa-solid fa-ranking-star" style="color: #6366f1;"></i> Top Accessed Endpoints</h3>
+        <% if (topEndpoints.length === 0) { %>
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No data yet.</p>
+        <% } else { %>
+            <% topEndpoints.forEach((ep, i) => { %>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="background: rgba(99,102,241,0.15); color: #818cf8; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">#<%= i+1 %></span>
+                    <span style="color: var(--text-muted); font-size: 0.85rem; font-family: monospace;"><%= ep.endpoint %></span>
+                </div>
+                <span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;"><%= ep.count %> calls</span>
+            </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+    <!-- Auth Type Breakdown -->
+    <div class="glass-card animate-fade-in" style="padding: 1.5rem;">
+        <h3 style="margin-bottom: 1.5rem; color: var(--text-primary);"><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Auth Type Breakdown</h3>
+        <% const total = jwtCount + apiKeyCount; %>
+        <% const jwtPct = total > 0 ? ((jwtCount/total)*100).toFixed(1) : 0; %>
+        <% const keyPct = total > 0 ? ((apiKeyCount/total)*100).toFixed(1) : 0; %>
+        <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #10b981; font-weight: 600;"><i class="fa-solid fa-id-badge"></i> JWT / Session</span>
+                <span style="color: var(--text-muted);"><%= jwtCount %> (<%= jwtPct %>%)</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 999px; height: 10px; overflow: hidden;">
+                <div style="width: <%= jwtPct %>%; background: linear-gradient(90deg, #10b981, #059669); height: 100%; border-radius: 999px; transition: width 1s ease;"></div>
+            </div>
+        </div>
+        <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #f59e0b; font-weight: 600;"><i class="fa-solid fa-key"></i> API Key</span>
+                <span style="color: var(--text-muted);"><%= apiKeyCount %> (<%= keyPct %>%)</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 999px; height: 10px; overflow: hidden;">
+                <div style="width: <%= keyPct %>%; background: linear-gradient(90deg, #f59e0b, #d97706); height: 100%; border-radius: 999px; transition: width 1s ease;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Login History per User -->
+<div class="glass-card animate-fade-in" style="padding: 1.5rem; margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--text-primary);"><i class="fa-solid fa-clock-rotate-left" style="color: #8b5cf6;"></i> Login History by User</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">User Email</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Login Count</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Last Login</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Last IP</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (users.length === 0) { %>
+                <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No login records yet.</td></tr>
+                <% } %>
+                <% users.forEach(u => { %>
+                <% const lastLogin = u.loginHistory && u.loginHistory.length > 0 ? u.loginHistory[u.loginHistory.length - 1] : null; %>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 0.75rem 1rem;"><i class="fa-solid fa-envelope" style="color: #6366f1; margin-right: 0.5rem;"></i><%= u.email %></td>
+                    <td style="padding: 0.75rem 1rem;"><span style="background: rgba(139,92,246,0.1); color: #8b5cf6; padding: 0.2rem 0.7rem; border-radius: 20px; font-weight: 600;"><%= u.loginHistory ? u.loginHistory.length : 0 %></span></td>
+                    <td style="padding: 0.75rem 1rem; color: var(--text-muted);"><%= lastLogin ? new Date(lastLogin.timestamp).toLocaleString('en-GB') : '—' %></td>
+                    <td style="padding: 0.75rem 1rem; font-family: monospace; color: var(--text-muted); font-size: 0.8rem;"><%= lastLogin && lastLogin.ip ? lastLogin.ip : '—' %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recent API/Token Request Log -->
+<div class="glass-card animate-fade-in" style="padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="color: var(--text-primary); margin: 0;"><i class="fa-solid fa-terminal" style="color: #06b6d4;"></i> Recent Request Log <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">(last 200)</span></h3>
+        <div style="display: flex; gap: 0.5rem;">
+            <button id="filterAll" class="filter-btn active-filter">All</button>
+            <button id="filterJWT" class="filter-btn">JWT</button>
+            <button id="filterKey" class="filter-btn">API Key</button>
+        </div>
+    </div>
+    <div style="overflow-x: auto; max-height: 420px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;" id="logsTable">
+            <thead style="position: sticky; top: 0; background: var(--bg-card);">
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Timestamp</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">User</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Method</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Endpoint</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Auth</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">IP</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                <% if (logs.length === 0) { %>
+                <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">No request logs yet.</td></tr>
+                <% } %>
+                <% logs.forEach(log => { %>
+                <tr class="log-row" data-auth="<%= log.authType %>" style="border-bottom: 1px solid rgba(255,255,255,0.04);" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 0.65rem 1rem; color: var(--text-muted); white-space: nowrap; font-size: 0.8rem;"><%= new Date(log.timestamp).toLocaleString('en-GB') %></td>
+                    <td style="padding: 0.65rem 1rem; font-size: 0.8rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= log.user ? log.user.email : '<span style="color:#64748b">Anonymous</span>' %></td>
+                    <td style="padding: 0.65rem 1rem;">
+                        <span style="padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
+                            background: <%= log.method === 'GET' ? 'rgba(16,185,129,0.15)' : log.method === 'POST' ? 'rgba(99,102,241,0.15)' : log.method === 'PUT' ? 'rgba(245,158,11,0.15)' : 'rgba(244,63,94,0.15)' %>;
+                            color: <%= log.method === 'GET' ? '#10b981' : log.method === 'POST' ? '#818cf8' : log.method === 'PUT' ? '#f59e0b' : '#f43f5e' %>;">
+                            <%= log.method %>
+                        </span>
+                    </td>
+                    <td style="padding: 0.65rem 1rem; font-family: monospace; font-size: 0.78rem; color: #cbd5e1; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= log.endpoint %></td>
+                    <td style="padding: 0.65rem 1rem;">
+                        <span style="padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
+                            background: <%= log.authType === 'JWT' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)' %>;
+                            color: <%= log.authType === 'JWT' ? '#10b981' : '#f59e0b' %>;">
+                            <%= log.authType %>
+                        </span>
+                    </td>
+                    <td style="padding: 0.65rem 1rem; font-family: monospace; font-size: 0.78rem; color: var(--text-muted);"><%= log.ip || '—' %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.filter-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted);
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+.active-filter {
+    background: rgba(99,102,241,0.2);
+    border-color: rgba(99,102,241,0.5);
+    color: #818cf8;
+}
+</style>
+
+<script>
+function filterLogs(type) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+    if (type === 'all') document.getElementById('filterAll').classList.add('active-filter');
+    else if (type === 'JWT') document.getElementById('filterJWT').classList.add('active-filter');
+    else document.getElementById('filterKey').classList.add('active-filter');
+
+    document.querySelectorAll('.log-row').forEach(row => {
+        row.style.display = (type === 'all' || row.dataset.auth === type) ? '' : 'none';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('filterAll').addEventListener('click', () => filterLogs('all'));
+    document.getElementById('filterJWT').addEventListener('click', () => filterLogs('JWT'));
+    document.getElementById('filterKey').addEventListener('click', () => filterLogs('API_KEY'));
+});
+</script>

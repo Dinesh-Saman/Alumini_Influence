@@ -15,20 +15,20 @@
         <div class="form-group mb-4">
             <label style="color: var(--text-muted); font-size: 0.9rem; display: block; margin-top: 1rem; margin-bottom: 0.8rem;">Granular Permissions (Scoping)</label>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
-                    <input type="checkbox" name="permissions" value="read:alumni"> 
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; color: #cbd5e1; font-size: 0.9rem;">
+                    <input type="checkbox" name="permissions" value="read:alumni" style="margin: 0; width: auto; cursor: pointer;"> 
                     <span>read:alumni</span>
                 </label>
-                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
-                    <input type="checkbox" name="permissions" value="read:analytics"> 
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; color: #cbd5e1; font-size: 0.9rem;">
+                    <input type="checkbox" name="permissions" value="read:analytics" style="margin: 0; width: auto; cursor: pointer;"> 
                     <span>read:analytics</span>
                 </label>
-                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
-                    <input type="checkbox" name="permissions" value="read:donations"> 
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; color: #cbd5e1; font-size: 0.9rem;">
+                    <input type="checkbox" name="permissions" value="read:donations" style="margin: 0; width: auto; cursor: pointer;"> 
                     <span>read:donations</span>
                 </label>
-                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #cbd5e1;">
-                    <input type="checkbox" name="permissions" value="read:alumni_of_day"> 
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; color: #cbd5e1; font-size: 0.9rem;">
+                    <input type="checkbox" name="permissions" value="read:alumni_of_day" style="margin: 0; width: auto; cursor: pointer;"> 
                     <span>read:alumni_of_day</span>
                 </label>
             </div>
@@ -40,7 +40,7 @@
 
 <!-- Active Keys Table -->
 <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-    <h3 style="margin-bottom: 1.5rem; margin-left: 1.2rem;"><i class="fa-solid fa-list-check"></i> Active Platform Keys</h3>
+    <h3 style="margin-bottom: 1.5rem;"><i class="fa-solid fa-list-check"></i> Active Platform Keys</h3>
     <div class="table-container">
         <table class="data-table">
             <thead>
@@ -116,8 +116,10 @@ async function loadKeys() {
                             </button>
                         </div>
                     </td>
-                    <td>
-                        ${key.permissions.map(p => `<span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #818cf8; margin-right: 5px; font-size: 0.7rem;">${p}</span>`).join('')}
+                    <td style="min-width: 180px;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; max-width: 200px;">
+                            ${key.permissions.map(p => `<span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #818cf8; font-size: 0.7rem; white-space: nowrap;">${p}</span>`).join('')}
+                        </div>
                     </td>
                     <td>
                         <span class="badge" style="background: ${key.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)'}; color: ${key.isActive ? '#10b981' : '#f43f5e'};">

@@ -140,27 +140,34 @@ exports.deleteProfile = async (req, res) => {
 // @route   PUT /api/profile/uploadphoto
 // @access  Private
 exports.uploadPhoto = async (req, res) => {
-    // This is a placeholder for the logic handled by route+multer, 
-    // usually we just update the profile field here if the file was uploaded
+    console.log('--- Upload Photo Start ---');
     if (!req.file) {
+        console.log('No file received');
         return res.status(400).json({ success: false, message: 'Please upload a file' });
     }
+    console.log('Received file:', req.file.filename);
 
     try {
-        const profile = await Profile.findOne({ user: req.user.id });
+        const userId = req.user._id || req.user.id;
+        console.log('Searching for profile with user ID:', userId);
+        
+        const profile = await Profile.findOne({ user: userId });
         if (!profile) {
+            console.log('Profile not found for user');
             return res.status(404).json({ success: false, message: 'Profile not found' });
         }
 
+        console.log('Previous Image:', profile.profileImage);
         profile.profileImage = req.file.filename;
         await profile.save();
+        console.log('Save successful! New image:', profile.profileImage);
 
         res.status(200).json({
             success: true,
             data: req.file.filename
         });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error('Upload Error:', err.message);
+        res.status(500).json({ success: false, message: 'Server Error: ' + err.message });
     }
 };

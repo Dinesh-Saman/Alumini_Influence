@@ -86,9 +86,10 @@ const resetPasswordSchema = Joi.object({
 // Bid Schemas
 
 const placeBidSchema = Joi.object({
-    amount: Joi.number().positive().required().messages({
+    amount: Joi.number().positive().max(100000000).required().messages({
         'number.base': 'Bid amount must be a number',
         'number.positive': 'Bid amount must be a positive number',
+        'number.max': 'Bid amount cannot exceed £100,000,000',
         'any.required': 'Bid amount is required',
     }),
 });

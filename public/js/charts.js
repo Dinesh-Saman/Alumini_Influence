@@ -66,25 +66,17 @@ document.addEventListener('DOMContentLoaded', async function() {
                             title: { display: !isMobile, text: 'Alumni Count', color: '#64748b', font: { weight: '600' } }
                         },
                         y: { 
-                            position: isMobile ? 'left' : 'right',
+                            position: 'left',
                             grid: { display: false },
                             ticks: {
                                 color: '#94a3b8',
-                                padding: 5,
+                                padding: 8,
                                 font: { size: isMobile ? 10 : 11 },
                                 callback: function(value) {
                                     const label = this.getLabelForValue(value);
                                     return label.length > truncateLimit ? label.substr(0, truncateLimit - 3) + '...' : label;
                                 }
                             }
-                        },
-                        yTitle: {
-                            position: 'left',
-                            display: !isMobile,
-                            title: { display: true, text: 'Technical Skills', color: '#64748b', font: { weight: '600' } },
-                            grid: { display: false },
-                            ticks: { display: false },
-                            border: { display: false }
                         }
                     }
                 }
@@ -143,25 +135,17 @@ document.addEventListener('DOMContentLoaded', async function() {
                             title: { display: !isMobile, text: 'Alumni Count', color: '#64748b', font: { weight: '600' } }
                         },
                         y: { 
-                            position: isMobile ? 'left' : 'right',
+                            position: 'left',
                             grid: { display: false },
                             ticks: {
                                 color: '#94a3b8',
-                                padding: 5,
+                                padding: 8,
                                 font: { size: isMobile ? 10 : 11 },
                                 callback: function(value) {
                                     const label = this.getLabelForValue(value);
                                     return label.length > truncateLimit ? label.substr(0, truncateLimit - 3) + '...' : label;
                                 }
                             }
-                        },
-                        yTitle: {
-                            position: 'left',
-                            display: !isMobile,
-                            title: { display: true, text: 'Professional Roles', color: '#64748b', font: { weight: '600' } },
-                            grid: { display: false },
-                            ticks: { display: false },
-                            border: { display: false }
                         }
                     }
                 }

@@ -9,8 +9,17 @@ exports.protect = async (req, res, next) => {
         token = req.headers.authorization.split(' ')[1];
     } 
     // 2. Check Session (Browser Context)
-    else if (req.session && req.session.userId) {
-        req.user = await User.findById(req.session.userId);
+    else if (req.session && (req.session.userId || req.session.adminId || req.session.portalId)) {
+        let id;
+        if (req.originalUrl.startsWith('/api/admin') && req.session.adminId) {
+            id = req.session.adminId;
+        } else if (req.session.portalId) {
+            id = req.session.portalId;
+        } else {
+            id = req.session.userId || req.session.adminId;
+        }
+        
+        req.user = await User.findById(id);
         if (req.user) return next();
     }
 

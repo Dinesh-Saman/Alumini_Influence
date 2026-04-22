@@ -1,7 +1,7 @@
-<div class="profile-container animate-fade-in" style="max-width: 100%; margin: 0 auto; background: rgba(15, 23, 42, 0.6); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+<div class="portal-glass-container animate-fade-in" style="margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; margin-bottom: 2rem;">
         <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
-            <a href="/portal/dashboard" style="display: inline-flex; justify-content: center; align-items: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 50%; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s ease; margin-top: 2px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
+            <a href="/portal/dashboard" class="back-btn-portal" style="display: inline-flex; justify-content: center; align-items: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 50%; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s ease; margin-top: 2px;">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div>
@@ -19,9 +19,23 @@
     <div id="alertBox"></div>
 
     <form id="profileForm">
+        <!-- 0. PROFILE PHOTO -->
+        <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">0. Profile Photo</h3>
+        <div style="display: flex; gap: 2rem; align-items: center; margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 3px solid #f59e0b; background: #0f172a; flex-shrink: 0;">
+                <img id="photoPreview" 
+                     src="<%= verifiedImage ? verifiedImage : 'https://ui-avatars.com/api/?name=' + (profile ? profile.firstName : 'Alumni') + '&background=f59e0b&color=fff&size=128' %>" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.9rem;">Update Portrait</label>
+                <input type="file" id="photoInput" accept="image/*" class="form-input" style="padding: 0.4rem; font-size: 0.85rem;">
+                <p style="color: #64748b; font-size: 0.75rem; margin-top: 0.5rem;">Recommended: Square image, max 10MB (JPG, PNG, GIF)</p>
+            </div>
+        </div>
         <!-- 1. CORE -->
         <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">1. Core Identity</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="responsive-grid-2" style="margin-bottom: 1.5rem;">
             <div>
                 <label style="display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.9rem;">First Name *</label>
                 <input type="text" id="firstName" required value="<%= profile ? profile.firstName : '' %>" class="form-input">
@@ -164,6 +178,11 @@
     font-size: 1.05rem;
 }
 
+.back-btn-portal:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: #fff !important;
+}
+
 /* Force standard browser Calendar UI to render white to match dark theme */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
@@ -182,7 +201,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: absolute; right: 10px; top: 10px; background: none; border: none; color: #f43f5e; cursor: pointer;
 }
 .grid-2 {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1rem;
+}
+@media (max-width: 640px) {
+    .grid-2 { grid-template-columns: 1fr; }
 }
 .grid-2 label {
     font-size: 0.95rem; color: #94a3b8; display: block; margin-bottom: 0.3rem; font-weight: 500;
@@ -306,6 +330,25 @@ document.getElementById('addLicenceBtn').addEventListener('click', addLicence);
 document.getElementById('addCourseBtn').addEventListener('click', addCourse);
 document.getElementById('addJobBtn').addEventListener('click', addJob);
 
+// Photo Preview Logic
+const photoPreview = document.getElementById('photoPreview');
+if (photoPreview) {
+    photoPreview.addEventListener('error', function() {
+        this.src = 'https://ui-avatars.com/api/?name=Alumni&background=f59e0b&color=fff&size=128';
+    });
+}
+
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photoPreview').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
 document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = document.getElementById('profileForm');
@@ -379,7 +422,33 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            alertBox.innerHTML = '<div style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 1.1rem;"><i class="fa-solid fa-check-circle"></i> <strong>Profile Data Successfully Saved!</strong></div>';
+            // Check if there's a photo to upload
+            const photoFile = document.getElementById('photoInput').files[0];
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile); // backend expects 'file' key
+                
+                try {
+                    const photoRes = await fetch('/api/profile/uploadphoto', {
+                        method: 'PUT',
+                        body: formData
+                    });
+                    if (!photoRes.ok) {
+                        const photoData = await photoRes.json();
+                        throw new Error(photoData.message || 'Photo upload failed');
+                    }
+                } catch(photoErr) {
+                    console.error('Photo upload error:', photoErr);
+                    alert('Profile data saved, but photo upload failed: ' + photoErr.message);
+                    submitBtns.forEach(btn => {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Retry Photo Save';
+                    });
+                    return; // Don't reload if photo failed
+                }
+            }
+
+            alertBox.innerHTML = '<div style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 1.1rem;"><i class="fa-solid fa-check-circle"></i> <strong>Everything Saved Successfully!</strong></div>';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             submitBtns.forEach(btn => {
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved Successfully!';

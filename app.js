@@ -65,7 +65,8 @@ app.use(mongoSanitize); // Prevent NoSQL Injection
 app.use(xssSanitize);   // Escape HTML tags
 
 // Serve static files (uploads and public folder)
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use('/uploads', express.static('public/uploads'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // EJS View Engine

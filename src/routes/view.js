@@ -7,14 +7,14 @@ const UsageLog = require('../models/UsageLog');
 
 // Middleware to check if user is logged in
 const ensureAuthenticated = (req, res, next) => {
-    if (req.session && req.session.userId) {
+    if (req.session && req.session.adminId) {
         return next();
     }
     res.redirect('/login');
 };
 
 const redirectIfAuthenticated = (req, res, next) => {
-    if (req.session && req.session.userId) {
+    if (req.session && req.session.adminId) {
         return res.redirect('/dashboard');
     }
     next();
@@ -22,7 +22,7 @@ const redirectIfAuthenticated = (req, res, next) => {
 
 // Route: Home -> Redirect to Dashboard if logged in, else login
 router.get('/', (req, res) => {
-    if (req.session && req.session.userId) {
+    if (req.session && req.session.adminId) {
         res.redirect('/dashboard');
     } else {
         res.redirect('/login');
@@ -52,20 +52,25 @@ router.get('/reset-password/:token', redirectIfAuthenticated, (req, res) => {
 // Route: Dashboard
 router.get('/dashboard', ensureAuthenticated, async (req, res) => {
     try {
-        const user = await User.findById(req.session.userId);
+        const user = await User.findById(req.session.adminId);
         
+        // Calculate targetDate (tomorrow at midnight) - matches the bidding logic
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 1);
+        targetDate.setHours(0, 0, 0, 0);
+
         // Fetch real stats
         const totalAlumni = await Profile.countDocuments();
         
-        // Find top bids (Live Ranking)
-        const topBids = await Bid.find({ status: 'active' })
+        // Find top bids for THE UPCOMING SLOT (Tomorrow)
+        const topBids = await Bid.find({ status: 'active', targetDate })
             .sort({ amount: -1 })
             .limit(5)
             .populate('user', 'email');
         
-        // Highest Bid for the current auction (Active status)
+        // Highest Bid for the target auction
         const highestBid = topBids.length > 0 ? topBids[0].amount : 0;
-        const activeBidsCount = await Bid.countDocuments({ status: 'active' });
+        const activeBidsCount = await Bid.countDocuments({ status: 'active', targetDate });
         
         // Latest Usage Logs
         const latestLogs = await UsageLog.find().sort({ timestamp: -1 }).limit(5);
@@ -73,6 +78,7 @@ router.get('/dashboard', ensureAuthenticated, async (req, res) => {
         res.render('dashboard', { 
             title: 'Dashboard', 
             user,
+            targetDate, // Pass this to show on the UI
             stats: {
                 totalAlumni,
                 activeBids: activeBidsCount,
@@ -113,6 +119,48 @@ router.get('/apikeys', ensureAuthenticated, async (req, res) => {
     res.render('apikeys', { title: 'API Key Management' });
 });
 
+// Route: Usage Statistics
+router.get('/usage', ensureAuthenticated, async (req, res) => {
+    try {
+        const UsageLog = require('../models/UsageLog');
+        // Last 200 logs, populated with user email
+        const logs = await UsageLog.find()
+            .sort({ timestamp: -1 })
+            .limit(200)
+            .populate('user', 'email');
+
+        // Top endpoints by count
+        const endpointCounts = {};
+        logs.forEach(l => {
+            const key = `${l.method} ${l.endpoint}`;
+            endpointCounts[key] = (endpointCounts[key] || 0) + 1;
+        });
+        const topEndpoints = Object.entries(endpointCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10)
+            .map(([endpoint, count]) => ({ endpoint, count }));
+
+        // Auth type breakdown
+        const jwtCount = logs.filter(l => l.authType === 'JWT').length;
+        const apiKeyCount = logs.filter(l => l.authType === 'API_KEY').length;
+
+        // Login history across all users
+        const users = await User.find().select('email loginHistory').sort({ 'loginHistory.timestamp': -1 });
+
+        res.render('usage', { 
+            title: 'Usage Statistics',
+            logs,
+            topEndpoints,
+            jwtCount,
+            apiKeyCount,
+            users
+        });
+    } catch(err) {
+        console.error(err);
+        res.render('usage', { title: 'Usage Statistics', logs: [], topEndpoints: [], jwtCount: 0, apiKeyCount: 0, users: [] });
+    }
+});
+
 // POST handling for session login is usually separate but let's do a simple one here for dashboard login
 router.post('/login', async (req, res) => {
     try {
@@ -136,8 +184,12 @@ router.post('/login', async (req, res) => {
             return res.render('login', { title: 'Login', error: 'Please verify your email first' });
         }
 
+        if (user.role !== 'admin') {
+            return res.render('login', { title: 'Login', error: 'Access denied. Admin only.' });
+        }
+
         // Set session
-        req.session.userId = user._id;
+        req.session.adminId = user._id;
         res.redirect('/dashboard');
     } catch (err) {
         res.render('login', { title: 'Login', error: 'Server error' });
@@ -146,7 +198,7 @@ router.post('/login', async (req, res) => {
 
 // Route: Logout
 router.get('/logout', (req, res) => {
-    req.session.destroy();
+    delete req.session.adminId;
     res.redirect('/login');
 });
 

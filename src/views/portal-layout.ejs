@@ -62,11 +62,34 @@
         .portal-main {
             padding-top: 5rem;
             margin: 0 auto;
-            width: 75%;
-            max-width: 1600px;
+            width: 85%;
+            max-width: 1400px;
             padding-left: 1rem;
             padding-right: 1rem;
             min-height: calc(100vh - 60px);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .portal-main { width: 95%; }
+            .portal-navbar { padding: 1rem; }
+            .portal-nav-links { gap: 1rem; }
+            .portal-nav-links a { font-size: 0.9rem; }
+        }
+
+        @media (max-width: 768px) {
+            .portal-navbar { 
+                flex-direction: column; 
+                height: auto; 
+                gap: 1rem;
+                padding: 1.5rem 1rem;
+            }
+            .portal-nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem 1rem;
+            }
+            .portal-main { width: 100%; padding-top: 8rem; }
         }
     </style>
 </head>
@@ -80,7 +103,7 @@
             <div class="portal-nav-links">
                 <a href="/portal/dashboard" class="<%= title === 'Alumni Dashboard' ? 'active' : '' %>"><i class="fa-solid fa-home"></i> Home</a>
                 <a href="/portal/profile" class="<%= title === 'My Profile' ? 'active' : '' %>"><i class="fa-solid fa-user"></i> My Profile</a>
-                <a href="/portal/bids" class="<%= title === 'Blind Bidding' ? 'active' : '' %>"><i class="fa-solid fa-gavel"></i> Bidding</a>
+                <a href="/portal/bidding" class="<%= title === 'Alumni Excellence Auction' ? 'active' : '' %>"><i class="fa-solid fa-gavel"></i> Auction Arena</a>
                 <a href="/portal/logout" style="color: #f43f5e;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
             </div>
         </nav>

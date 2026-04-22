@@ -9,19 +9,21 @@
         <p class="stat-value"><%= stats.totalAlumni || 0 %></p>
     </div>
     <div class="stat-card glass-card">
-        <h3><i class="fa-solid fa-gavel"></i> Active Bids</h3>
+        <h3><i class="fa-solid fa-gavel"></i> Auction Bidders</h3>
         <p class="stat-value"><%= stats.activeBids || 0 %></p>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">For <%= targetDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) %> Slot</span>
     </div>
     <div class="stat-card glass-card">
         <h3><i class="fa-solid fa-trophy"></i> Highest Bid</h3>
         <p class="stat-value">£<%= stats.highestBid || 0 %></p>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Current Leading</span>
     </div>
 </div>
 
 <div class="glass-card mb-4 animate-fade-in" style="animation-delay: 0.2s;">
     <div class="chart-header">
-        <h3><i class="fa-solid fa-ranking-star"></i> Top Bids</h3>
-        <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light);">Live Ranking</span>
+        <h3><i class="fa-solid fa-ranking-star"></i> Live Excellence Auction Ranking</h3>
+        <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light);">For <%= targetDate.toLocaleDateString('en-GB') %></span>
     </div>
     <div class="table-container">
         <table class="data-table">
@@ -38,7 +40,7 @@
                         <tr>
                             <td><strong><%= bid.user ? bid.user.email : 'Unknown' %></strong></td>
                             <td style="color: var(--success); font-weight: 700;">£<%= bid.amount %></td>
-                            <td><%= new Date(bid.bidDate).toLocaleDateString() %></td>
+                            <td><%= new Date(bid.targetDate).toLocaleDateString() %></td>
                         </tr>
                     <% }); %>
                 <% } else { %>
