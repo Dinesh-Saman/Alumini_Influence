@@ -317,6 +317,11 @@ components:
         name:
           type: string
           example: "AR Mobile Client v1"
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["read:alumni_of_day", "read:analytics"]
 
     ApiKeyResponse:
       type: object
@@ -346,6 +351,22 @@ components:
         method:
           type: string
           example: "GET"
+
+    UsageLog:
+      type: object
+      properties:
+        endpoint:
+          type: string
+        method:
+          type: string
+        authType:
+          type: string
+          enum: [JWT, API_KEY]
+        timestamp:
+          type: string
+          format: date-time
+        ip:
+          type: string
 
     # ── Errors ────────────────────────────────────────────────
     ErrorResponse:
@@ -954,6 +975,130 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/apikeys/{id}/activate:
+    put:
+      tags: [Admin — API Keys]
+      summary: Reactivate an API key (Admin only)
+      description: Re-activates a previously revoked API key. **Requires admin role.**
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: API Key reactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: "API Key reactivated"
+
+  /admin/logs:
+    get:
+      tags: [Admin — Statistics]
+      summary: Get all API usage logs (Admin only)
+      description: Returns the latest 100 usage logs across the entire system.
+      responses:
+        '200':
+          description: List of usage logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UsageLog'
+
+  /admin/metrics/charts:
+    get:
+      tags: [Admin — Statistics]
+      summary: Get aggregated chart data (Admin only)
+      description: |
+          Returns complex aggregated data for the dashboard charts, including:
+          - Skills Gap (top certifications)
+          - Industry Placement trends
+          - Career Pathways
+          - Role distribution
+          - Top Employers
+      responses:
+        '200':
+          description: Aggregated data for charts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+  /admin/users/{id}/logins:
+    get:
+      tags: [Admin — User Management]
+      summary: Get user login history (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User login history returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      loginHistory:
+                        type: array
+                        items:
+                          type: object
+
+  /admin/users/{id}/bonus:
+    put:
+      tags: [Admin — User Management]
+      summary: Toggle bonus bidding slot (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                available:
+                  type: boolean
+      responses:
+        '200':
+          description: Bonus slot status updated
 
   # ── Public Client API ──────────────────────────────────────
   /client/alumni-of-the-day:
