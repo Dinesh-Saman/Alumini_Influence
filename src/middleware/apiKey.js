@@ -103,7 +103,7 @@ exports.requireScope = (requiredPermission) => {
 exports.authorizePlatform = (scope) => {
     return async (req, res, next) => {
         // 1. Check for interactive session (Dashboard Browser Access)
-        if (req.session && req.session.userId) {
+        if (req.session && (req.session.userId || req.session.adminId || req.session.portalId)) {
             return next();
         }
 

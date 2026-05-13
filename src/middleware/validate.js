@@ -59,6 +59,7 @@ const registerSchema = Joi.object({
         'any.required': 'Email is required',
     }),
     password: passwordSchema,
+    role: Joi.string().valid('user', 'admin').optional()
 });
 
 const registerAdminSchema = Joi.object({
