@@ -68,9 +68,17 @@ exports.register = async (req, res) => {
         }
 
         // Create user
+        const { role } = req.body;
+        let userRole = 'user';
+
+        if (role === 'admin') {
+            userRole = 'admin';
+        }
+
         const user = await User.create({
             email,
             password,
+            role: userRole
         });
 
         // Get verification token

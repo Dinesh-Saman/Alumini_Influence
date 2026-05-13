@@ -1,164 +1,309 @@
+<% 
+    const { logs, jwtCount, apiKeyCount, users, topEndpoints } = locals;
+%>
 <div class="dashboard-header animate-fade-in">
-    <h1><i class="fa-solid fa-chart-bar"></i> Usage Statistics</h1>
+    <h1><i class="fa-solid fa-chart-bar" aria-hidden="true"></i> Usage Statistics</h1>
     <p>Monitor login activity, API token usage, and endpoint access patterns across the platform.</p>
 </div>
 
 <!-- Summary Cards -->
-<div class="animate-fade-in" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #6366f1; text-align: center;">
-        <i class="fa-solid fa-list-check" style="font-size: 2rem; color: #6366f1; margin-bottom: 0.75rem;"></i>
-        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">Total Requests</p>
-        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= logs.length %></h2>
+<div class="animate-fade-in stats-grid">
+    <div class="glass-card stat-card border-indigo">
+        <i class="fa-solid fa-list-check icon-indigo" aria-hidden="true"></i>
+        <p class="stat-label">Total Requests</p>
+        <h2 class="stat-value"><%= (logs && logs.length) || 0 %></h2>
     </div>
-    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #10b981; text-align: center;">
-        <i class="fa-solid fa-id-badge" style="font-size: 2rem; color: #10b981; margin-bottom: 0.75rem;"></i>
-        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">JWT / Session</p>
-        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= jwtCount %></h2>
+    <div class="glass-card stat-card border-emerald">
+        <i class="fa-solid fa-id-badge icon-emerald" aria-hidden="true"></i>
+        <p class="stat-label">JWT / Session</p>
+        <h2 class="stat-value"><%= jwtCount || 0 %></h2>
     </div>
-    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #f59e0b; text-align: center;">
-        <i class="fa-solid fa-key" style="font-size: 2rem; color: #f59e0b; margin-bottom: 0.75rem;"></i>
-        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">API Key Calls</p>
-        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= apiKeyCount %></h2>
+    <div class="glass-card stat-card border-amber">
+        <i class="fa-solid fa-key icon-amber" aria-hidden="true"></i>
+        <p class="stat-label">API Key Calls</p>
+        <h2 class="stat-value"><%= apiKeyCount || 0 %></h2>
     </div>
-    <div class="glass-card" style="padding: 1.5rem; border-top: 3px solid #8b5cf6; text-align: center;">
-        <i class="fa-solid fa-users" style="font-size: 2rem; color: #8b5cf6; margin-bottom: 0.75rem;"></i>
-        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">Tracked Users</p>
-        <h2 style="font-size: 2.2rem; font-weight: 800; margin: 0;"><%= users.length %></h2>
+    <div class="glass-card stat-card border-violet">
+        <i class="fa-solid fa-users icon-violet" aria-hidden="true"></i>
+        <p class="stat-label">Tracked Users</p>
+        <h2 class="stat-value"><%= (users && users.length) || 0 %></h2>
     </div>
 </div>
 
-<div class="responsive-grid-2" style="margin-bottom: 2rem;">
+<div class="responsive-grid-2 mb-2rem">
 
     <!-- Top Endpoints -->
-    <div class="glass-card animate-fade-in" style="padding: 1.5rem;">
-        <h3 style="margin-bottom: 1rem; color: var(--text-primary);"><i class="fa-solid fa-ranking-star" style="color: #6366f1;"></i> Top Accessed Endpoints</h3>
-        <% if (topEndpoints.length === 0) { %>
-            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No data yet.</p>
+    <div class="glass-card animate-fade-in card-padding">
+        <h3 class="card-title"><i class="fa-solid fa-ranking-star icon-heading-indigo" aria-hidden="true"></i> Top Accessed Endpoints</h3>
+        <% if (!topEndpoints || topEndpoints.length === 0) { %>
+            <p class="empty-msg">No data yet.</p>
         <% } else { %>
             <% topEndpoints.forEach((ep, i) => { %>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span style="background: rgba(99,102,241,0.15); color: #818cf8; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">#<%= i+1 %></span>
-                    <span style="color: var(--text-muted); font-size: 0.85rem; font-family: monospace;"><%= ep.endpoint %></span>
+            <div class="list-item">
+                <div class="list-item-main">
+                    <span class="rank-badge">#<%= i+1 %></span>
+                    <span class="mono-text"><%= ep.endpoint %></span>
                 </div>
-                <span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;"><%= ep.count %> calls</span>
+                <span class="count-badge"><%= ep.count %> calls</span>
             </div>
             <% }) %>
         <% } %>
     </div>
 
     <!-- Auth Type Breakdown -->
-    <div class="glass-card animate-fade-in" style="padding: 1.5rem;">
-        <h3 style="margin-bottom: 1.5rem; color: var(--text-primary);"><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Auth Type Breakdown</h3>
-        <% const total = jwtCount + apiKeyCount; %>
-        <% const jwtPct = total > 0 ? ((jwtCount/total)*100).toFixed(1) : 0; %>
-        <% const keyPct = total > 0 ? ((apiKeyCount/total)*100).toFixed(1) : 0; %>
-        <div style="margin-bottom: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span style="color: #10b981; font-weight: 600;"><i class="fa-solid fa-id-badge"></i> JWT / Session</span>
-                <span style="color: var(--text-muted);"><%= jwtCount %> (<%= jwtPct %>%)</span>
+    <div class="glass-card animate-fade-in card-padding">
+        <h3 class="card-title"><i class="fa-solid fa-shield-halved icon-heading-emerald" aria-hidden="true"></i> Auth Type Breakdown</h3>
+        <% 
+            const total = (jwtCount || 0) + (apiKeyCount || 0);
+            const jwtPct = total > 0 ? ((jwtCount/total)*100).toFixed(1) : 0;
+            const keyPct = total > 0 ? ((apiKeyCount/total)*100).toFixed(1) : 0;
+        %>
+        <div class="mb-1-5rem">
+            <div class="progress-label">
+                <span class="label-emerald"><i class="fa-solid fa-id-badge" aria-hidden="true"></i> JWT / Session</span>
+                <span class="text-muted"><%= jwtCount %> (<%= jwtPct %>%)</span>
             </div>
-            <div style="background: rgba(255,255,255,0.05); border-radius: 999px; height: 10px; overflow: hidden;">
-                <div style="width: <%= jwtPct %>%; background: linear-gradient(90deg, #10b981, #059669); height: 100%; border-radius: 999px; transition: width 1s ease;"></div>
+            <div class="progress-bg">
+                <div class="progress-bar bar-emerald" style="--width: <%= jwtPct %>%"></div>
             </div>
         </div>
         <div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span style="color: #f59e0b; font-weight: 600;"><i class="fa-solid fa-key"></i> API Key</span>
-                <span style="color: var(--text-muted);"><%= apiKeyCount %> (<%= keyPct %>%)</span>
+            <div class="progress-label">
+                <span class="label-amber"><i class="fa-solid fa-key" aria-hidden="true"></i> API Key</span>
+                <span class="text-muted"><%= apiKeyCount %> (<%= keyPct %>%)</span>
             </div>
-            <div style="background: rgba(255,255,255,0.05); border-radius: 999px; height: 10px; overflow: hidden;">
-                <div style="width: <%= keyPct %>%; background: linear-gradient(90deg, #f59e0b, #d97706); height: 100%; border-radius: 999px; transition: width 1s ease;"></div>
+            <div class="progress-bg">
+                <div class="progress-bar bar-amber" style="--width: <%= keyPct %>%"></div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Login History per User -->
-<div class="glass-card animate-fade-in" style="padding: 1.5rem; margin-bottom: 2rem;">
-    <h3 style="margin-bottom: 1rem; color: var(--text-primary);"><i class="fa-solid fa-clock-rotate-left" style="color: #8b5cf6;"></i> Login History by User</h3>
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+<div class="glass-card animate-fade-in card-padding mb-2rem">
+    <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left icon-heading-violet" aria-hidden="true"></i> Login History by User</h3>
+    <div class="table-responsive">
+        <table class="data-table">
             <thead>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">User Email</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Login Count</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Last Login</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Last IP</th>
+                <tr>
+                    <th scope="col">User Email</th>
+                    <th scope="col">Login Count</th>
+                    <th scope="col">Last Login</th>
+                    <th scope="col">Last IP</th>
                 </tr>
             </thead>
             <tbody>
-                <% if (users.length === 0) { %>
-                <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No login records yet.</td></tr>
+                <% if (!users || users.length === 0) { %>
+                <tr><td colspan="4" class="empty-msg">No login records yet.</td></tr>
+                <% } else { %>
+                    <% users.forEach(u => { %>
+                    <% const lastLogin = u.loginHistory && u.loginHistory.length > 0 ? u.loginHistory[u.loginHistory.length - 1] : null; %>
+                    <tr class="table-row">
+                        <td><i class="fa-solid fa-envelope icon-list-indigo" aria-hidden="true"></i><%= u.email %></td>
+                        <td><span class="badge-violet"><%= u.loginHistory ? u.loginHistory.length : 0 %></span></td>
+                        <td class="text-muted"><%= lastLogin ? new Date(lastLogin.timestamp).toLocaleString('en-GB') : '—' %></td>
+                        <td class="mono-text text-muted text-small-fixed"><%= lastLogin && lastLogin.ip ? lastLogin.ip : '—' %></td>
+                    </tr>
+                    <% }) %>
                 <% } %>
-                <% users.forEach(u => { %>
-                <% const lastLogin = u.loginHistory && u.loginHistory.length > 0 ? u.loginHistory[u.loginHistory.length - 1] : null; %>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 0.75rem 1rem;"><i class="fa-solid fa-envelope" style="color: #6366f1; margin-right: 0.5rem;"></i><%= u.email %></td>
-                    <td style="padding: 0.75rem 1rem;"><span style="background: rgba(139,92,246,0.1); color: #8b5cf6; padding: 0.2rem 0.7rem; border-radius: 20px; font-weight: 600;"><%= u.loginHistory ? u.loginHistory.length : 0 %></span></td>
-                    <td style="padding: 0.75rem 1rem; color: var(--text-muted);"><%= lastLogin ? new Date(lastLogin.timestamp).toLocaleString('en-GB') : '—' %></td>
-                    <td style="padding: 0.75rem 1rem; font-family: monospace; color: var(--text-muted); font-size: 0.8rem;"><%= lastLogin && lastLogin.ip ? lastLogin.ip : '—' %></td>
-                </tr>
-                <% }) %>
             </tbody>
         </table>
     </div>
 </div>
 
 <!-- Recent API/Token Request Log -->
-<div class="glass-card animate-fade-in" style="padding: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3 style="color: var(--text-primary); margin: 0;"><i class="fa-solid fa-terminal" style="color: #06b6d4;"></i> Recent Request Log <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">(last 200)</span></h3>
-        <div style="display: flex; gap: 0.5rem;">
-            <button id="filterAll" class="filter-btn active-filter">All</button>
-            <button id="filterJWT" class="filter-btn">JWT</button>
-            <button id="filterKey" class="filter-btn">API Key</button>
+<div class="glass-card animate-fade-in card-padding">
+    <div class="table-header">
+        <h3 class="card-title mb-0"><i class="fa-solid fa-terminal icon-heading-cyan" aria-hidden="true"></i> Recent Request Log <span class="text-small-muted">(last 200)</span></h3>
+        <div class="filter-group">
+            <button type="button" id="filterAll" class="filter-btn active-filter">All</button>
+            <button type="button" id="filterJWT" class="filter-btn">JWT</button>
+            <button type="button" id="filterKey" class="filter-btn">API Key</button>
         </div>
     </div>
-    <div style="overflow-x: auto; max-height: 420px; overflow-y: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;" id="logsTable">
-            <thead style="position: sticky; top: 0; background: var(--bg-card);">
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Timestamp</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">User</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Method</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Endpoint</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Auth</th>
-                    <th style="text-align: left; padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">IP</th>
+    <div class="table-responsive table-scroll-y">
+        <table class="data-table" id="logsTable">
+            <thead class="sticky-head">
+                <tr>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Method</th>
+                    <th scope="col">Endpoint</th>
+                    <th scope="col">Auth</th>
+                    <th scope="col">IP</th>
                 </tr>
             </thead>
             <tbody id="logsBody">
-                <% if (logs.length === 0) { %>
-                <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">No request logs yet.</td></tr>
+                <% if (!logs || logs.length === 0) { %>
+                <tr><td colspan="6" class="empty-msg">No request logs yet.</td></tr>
+                <% } else { %>
+                    <% logs.forEach(log => { %>
+                    <tr class="log-row table-row" data-auth="<%= log.authType %>">
+                        <td class="text-muted nowrap-small"><%= new Date(log.timestamp).toLocaleString('en-GB') %></td>
+                        <td class="user-cell"><%- log.user ? log.user.email : '<span class="text-anonymous">Anonymous</span>' %></td>
+                        <td>
+                            <% 
+                                let methodClass = 'method-other';
+                                if (log.method === 'GET') methodClass = 'method-get';
+                                else if (log.method === 'POST') methodClass = 'method-post';
+                                else if (log.method === 'PUT') methodClass = 'method-put';
+                                else if (log.method === 'DELETE') methodClass = 'method-delete';
+                            %>
+                            <span class="method-badge <%= methodClass %>">
+                                <%= log.method %>
+                            </span>
+                        </td>
+                        <td class="mono-text endpoint-cell"><%= log.endpoint %></td>
+                        <td>
+                            <span class="auth-badge <%= log.authType === 'JWT' ? 'auth-jwt' : 'auth-key' %>">
+                                <%= log.authType %>
+                            </span>
+                        </td>
+                        <td class="mono-text text-muted"><%= log.ip || '—' %></td>
+                    </tr>
+                    <% }) %>
                 <% } %>
-                <% logs.forEach(log => { %>
-                <tr class="log-row" data-auth="<%= log.authType %>" style="border-bottom: 1px solid rgba(255,255,255,0.04);" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 0.65rem 1rem; color: var(--text-muted); white-space: nowrap; font-size: 0.8rem;"><%= new Date(log.timestamp).toLocaleString('en-GB') %></td>
-                    <td style="padding: 0.65rem 1rem; font-size: 0.8rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= log.user ? log.user.email : '<span style="color:#64748b">Anonymous</span>' %></td>
-                    <td style="padding: 0.65rem 1rem;">
-                        <span style="padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
-                            background: <%= log.method === 'GET' ? 'rgba(16,185,129,0.15)' : log.method === 'POST' ? 'rgba(99,102,241,0.15)' : log.method === 'PUT' ? 'rgba(245,158,11,0.15)' : 'rgba(244,63,94,0.15)' %>;
-                            color: <%= log.method === 'GET' ? '#10b981' : log.method === 'POST' ? '#818cf8' : log.method === 'PUT' ? '#f59e0b' : '#f43f5e' %>;">
-                            <%= log.method %>
-                        </span>
-                    </td>
-                    <td style="padding: 0.65rem 1rem; font-family: monospace; font-size: 0.78rem; color: #cbd5e1; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= log.endpoint %></td>
-                    <td style="padding: 0.65rem 1rem;">
-                        <span style="padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
-                            background: <%= log.authType === 'JWT' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)' %>;
-                            color: <%= log.authType === 'JWT' ? '#10b981' : '#f59e0b' %>;">
-                            <%= log.authType %>
-                        </span>
-                    </td>
-                    <td style="padding: 0.65rem 1rem; font-family: monospace; font-size: 0.78rem; color: var(--text-muted);"><%= log.ip || '—' %></td>
-                </tr>
-                <% }) %>
             </tbody>
         </table>
     </div>
 </div>
 
 <style>
+/* Dashboard Specific Styles */
+.stats-grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 1.5rem; 
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    padding: 1.5rem; 
+    text-align: center;
+}
+
+.border-indigo { border-top: 3px solid #6366f1; }
+.border-emerald { border-top: 3px solid #10b981; }
+.border-amber { border-top: 3px solid #f59e0b; }
+.border-violet { border-top: 3px solid #8b5cf6; }
+
+.icon-indigo { font-size: 2rem; color: #6366f1; margin-bottom: 0.75rem; }
+.icon-emerald { font-size: 2rem; color: #10b981; margin-bottom: 0.75rem; }
+.icon-amber { font-size: 2rem; color: #f59e0b; margin-bottom: 0.75rem; }
+.icon-violet { font-size: 2rem; color: #8b5cf6; margin-bottom: 0.75rem; }
+
+.icon-heading-indigo { color: #6366f1; }
+.icon-heading-emerald { color: #10b981; }
+.icon-heading-violet { color: #8b5cf6; }
+.icon-heading-cyan { color: #06b6d4; }
+.icon-list-indigo { color: #6366f1; margin-right: 0.5rem; }
+
+.label-emerald { color: #10b981; font-weight: 600; }
+.label-amber { color: #f59e0b; font-weight: 600; }
+
+.mb-0 { margin: 0; }
+.text-small-fixed { font-size: 0.8rem; }
+.nowrap-small { white-space: nowrap; font-size: 0.8rem; }
+.table-scroll-y { max-height: 420px; overflow-y: auto; }
+
+.mb-2rem { margin-bottom: 2rem; }
+.mb-1-5rem { margin-bottom: 1.5rem; }
+
+.progress-bar { 
+    height: 100%; 
+    border-radius: 999px; 
+    transition: width 1s ease; 
+    width: var(--width, 0%);
+}
+
+.stat-label {
+    color: var(--text-muted); 
+    font-size: 0.8rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 2.2rem; 
+    font-weight: 800; 
+    margin: 0;
+}
+
+.card-padding { padding: 1.5rem; }
+.card-title { margin-bottom: 1rem; color: var(--text-primary); }
+
+.empty-msg { color: var(--text-muted); text-align: center; padding: 2rem; }
+
+.list-item {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0.6rem 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.list-item-main { display: flex; align-items: center; gap: 0.75rem; }
+
+.rank-badge {
+    background: rgba(99,102,241,0.15); 
+    color: #818cf8; 
+    font-size: 0.7rem; 
+    padding: 0.2rem 0.5rem; 
+    border-radius: 4px; 
+    font-weight: 700;
+}
+
+.mono-text { font-family: monospace; }
+.count-badge {
+    background: rgba(99,102,241,0.1); 
+    color: #6366f1; 
+    padding: 0.2rem 0.7rem; 
+    border-radius: 20px; 
+    font-size: 0.8rem; 
+    font-weight: 600;
+}
+
+.progress-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+.progress-bg { background: rgba(255,255,255,0.05); border-radius: 999px; height: 10px; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 999px; transition: width 1s ease; }
+.bar-emerald { background: linear-gradient(90deg, #10b981, #059669); }
+.bar-amber { background: linear-gradient(90deg, #f59e0b, #d97706); }
+
+.table-responsive { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.data-table th {
+    text-align: left; 
+    padding: 0.75rem 1rem; 
+    color: var(--text-muted); 
+    font-weight: 600; 
+    text-transform: uppercase; 
+    font-size: 0.75rem; 
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.table-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; }
+.table-row:hover { background: rgba(255,255,255,0.03); }
+.table-row td { padding: 0.75rem 1rem; }
+
+.badge-violet {
+    background: rgba(139,92,246,0.1); 
+    color: #8b5cf6; 
+    padding: 0.2rem 0.7rem; 
+    border-radius: 20px; 
+    font-weight: 600;
+}
+
+.table-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 1rem;
+}
+
+.text-small-muted { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+.filter-group { display: flex; gap: 0.5rem; }
+
 .filter-btn {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
@@ -169,28 +314,82 @@
     font-size: 0.8rem;
     transition: all 0.2s;
 }
+
 .active-filter {
     background: rgba(99,102,241,0.2);
     border-color: rgba(99,102,241,0.5);
     color: #818cf8;
 }
+
+.sticky-head { position: sticky; top: 0; background: var(--bg-card); z-index: 10; }
+
+.user-cell {
+    padding: 0.65rem 1rem; 
+    font-size: 0.8rem; 
+    max-width: 160px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+}
+
+.text-anonymous { color: #64748b; }
+
+.method-badge {
+    padding: 0.15rem 0.5rem; 
+    border-radius: 4px; 
+    font-size: 0.72rem; 
+    font-weight: 700;
+}
+
+.method-get { background: rgba(16,185,129,0.15); color: #10b981; }
+.method-post { background: rgba(99,102,241,0.15); color: #818cf8; }
+.method-put { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.method-delete { background: rgba(244,63,94,0.15); color: #f43f5e; }
+.method-other { background: rgba(255,255,255,0.1); color: var(--text-muted); }
+
+.endpoint-cell {
+    padding: 0.65rem 1rem; 
+    font-size: 0.78rem; 
+    color: #cbd5e1; 
+    max-width: 200px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+}
+
+.auth-badge {
+    padding: 0.15rem 0.5rem; 
+    border-radius: 4px; 
+    font-size: 0.72rem; 
+    font-weight: 700;
+}
+
+.auth-jwt { background: rgba(16,185,129,0.1); color: #10b981; }
+.auth-key { background: rgba(245,158,11,0.1); color: #f59e0b; }
 </style>
 
 <script>
-function filterLogs(type) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
-    if (type === 'all') document.getElementById('filterAll').classList.add('active-filter');
-    else if (type === 'JWT') document.getElementById('filterJWT').classList.add('active-filter');
-    else document.getElementById('filterKey').classList.add('active-filter');
+(function() {
+    function filterLogs(type) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+        
+        const btnId = type === 'all' ? 'filterAll' : (type === 'JWT' ? 'filterJWT' : 'filterKey');
+        const btn = document.getElementById(btnId);
+        if (btn) btn.classList.add('active-filter');
 
-    document.querySelectorAll('.log-row').forEach(row => {
-        row.style.display = (type === 'all' || row.dataset.auth === type) ? '' : 'none';
+        document.querySelectorAll('.log-row').forEach(row => {
+            row.style.display = (type === 'all' || row.dataset.auth === type) ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnAll = document.getElementById('filterAll');
+        const btnJWT = document.getElementById('filterJWT');
+        const btnKey = document.getElementById('filterKey');
+
+        if (btnAll) btnAll.addEventListener('click', () => filterLogs('all'));
+        if (btnJWT) btnJWT.addEventListener('click', () => filterLogs('JWT'));
+        if (btnKey) btnKey.addEventListener('click', () => filterLogs('API_KEY'));
     });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('filterAll').addEventListener('click', () => filterLogs('all'));
-    document.getElementById('filterJWT').addEventListener('click', () => filterLogs('JWT'));
-    document.getElementById('filterKey').addEventListener('click', () => filterLogs('API_KEY'));
-});
+})();
 </script>
